@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Informe mensual de contratación y pagos · FDL Usme</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: dos archivos de entrada, resumen, pestañas (resumen, contratos, alertas, metodología) y descargas */
+:root{
+  --paper:#f5f6f8; --surface:#ffffff; --ink:#152235; --muted:#5b6879; --line:#dde2e9;
+  --accent:#1d4f91; --accent-soft:#e6eef8; --warn:#9a3412; --warn-soft:#fdeee4; --ok:#166534; --ok-soft:#e5f4ea;
+  --body:"Public Sans",system-ui,-apple-system,"Segoe UI",Arial,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0f1722; --surface:#16212f; --ink:#e7ecf3; --muted:#9aa7b8; --line:#2a3748;
+  --accent:#7fb0ee; --accent-soft:#1c2d44; --warn:#f2a374; --warn-soft:#3a2418; --ok:#7fd49a; --ok-soft:#173022; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --paper:#0f1722; --surface:#16212f; --ink:#e7ecf3; --muted:#9aa7b8; --line:#2a3748;
+  --accent:#7fb0ee; --accent-soft:#1c2d44; --warn:#f2a374; --warn-soft:#3a2418; --ok:#7fd49a; --ok-soft:#173022; color-scheme:dark;}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font:15px/1.5 var(--body)}
+.wrap{max-width:1180px;margin:0 auto;padding:24px 20px 48px;display:grid;gap:20px}
+.wrap>*{min-width:0}
+header{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between}
+h1{font:700 1.55rem/1.2 var(--body);margin:0;text-wrap:balance}
+.sub{color:var(--muted);margin:4px 0 0;font-size:.92rem}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px}
+.load{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.drop{border:1.5px dashed var(--line);border-radius:8px;padding:14px 16px;display:flex;gap:14px;align-items:center;cursor:pointer;transition:border-color .15s,background .15s}
+.drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft)}
+.drop.done{border-style:solid;border-color:var(--ok);}
+.drop strong{display:block}
+.drop small{color:var(--muted);display:block}
+.ico{width:38px;height:38px;border-radius:8px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;flex:none;font-weight:700}
+.drop.done .ico{background:var(--ok-soft);color:var(--ok)}
+.status{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:.85rem;color:var(--muted)}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:2px 10px;border-radius:999px;font-size:.78rem;font-weight:600;white-space:nowrap}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.info{background:var(--accent-soft);color:var(--accent)}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.kpi span{display:block;font-size:.78rem;color:var(--muted)}
+.kpi b{display:block;font:600 1.2rem/1.3 var(--mono);font-variant-numeric:tabular-nums;margin-top:4px}
+.kpi em{font-style:normal;font-size:.78rem;color:var(--muted)}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid var(--line)}
+.tab{font:inherit;font-size:.9rem;font-weight:600;padding:9px 14px;border:0;border-bottom:2.5px solid transparent;background:none;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+.tab:hover{color:var(--ink)}
+.q{margin:0 0 12px;font-size:.92rem;color:var(--muted);max-width:80ch}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.86rem}
+th,td{padding:7px 9px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap;vertical-align:top}
+th{font-size:.74rem;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);font-weight:600;background:var(--paper)}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+td.w{white-space:normal;min-width:180px;max-width:340px}
+tr.tot td{font-weight:700;background:var(--accent);color:var(--surface)}
+tr.clic{cursor:pointer}
+tr.clic:hover td{background:var(--accent-soft)}
+tr.det>td{background:var(--paper);padding:10px 12px 14px;white-space:normal}
+tr.det table{font-size:.8rem}
+.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button.b{font:inherit;font-size:.86rem;font-weight:600;padding:7px 14px;border-radius:6px;border:1px solid var(--accent);background:var(--accent);color:var(--surface);cursor:pointer}
+button.b.sec{background:var(--surface);color:var(--accent)}
+button.b:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,input:focus-visible,.drop:focus-visible,tr.clic:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input[type=search]{font:inherit;font-size:.9rem;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);min-width:300px}
+label.f{display:flex;flex-direction:column;font-size:.78rem;color:var(--muted);gap:3px}
+.chk{display:flex;gap:6px;align-items:center;font-size:.85rem}
+.toolbar{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:10px}
+.note{font-size:.84rem;color:var(--muted);max-width:85ch}
+.note li{margin:5px 0}
+.msg{font-size:.85rem}
+.msg:empty{display:none}
+.msg.err{color:var(--warn)}
+.muted{color:var(--muted)}
+.empty{padding:28px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:8px}
+.grupo{margin:0 0 18px}
+.grupo h3{font-size:.95rem;margin:0 0 6px;display:flex;gap:8px;align-items:center}
+.grupo p{margin:0 0 8px}
+.chg{color:var(--warn)}
+.bar{display:flex;height:8px;border-radius:4px;overflow:hidden;background:var(--line);min-width:90px}
+.bar i{display:block;height:100%}
+@media (max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.load{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Informe mensual de contratación y pagos</h1>
+      <p class="sub">Fondo de Desarrollo Local de Usme · Llena el valor pagado y girado de la Base de contratación con el Reporte CRP de BogData</p>
+    </div>
+    <div class="status"><a href="../../index.html" style="color:var(--accent)">← Módulos</a><span id="status"></span></div>
+  </header>
+
+  <section class="card" aria-label="Cargar archivos">
+    <div class="load">
+      <div class="drop" id="dropB" tabindex="0" role="button" aria-describedby="helpB">
+        <div class="ico" aria-hidden="true">1</div>
+        <div><strong>Base de contratación (.xlsx)</strong><small id="helpB">El formato que envía el área: No., NUMERO DEL CONTRATO, contratista, tipo de persona, documento y «valor pagado y girado a la fecha». Si ya viene diligenciada, el módulo muestra qué valores cambian.</small></div>
+        <input type="file" id="fileB" accept=".xlsx,.xlsm" hidden>
+      </div>
+      <div class="drop" id="dropC" tabindex="0" role="button" aria-describedby="helpC">
+        <div class="ico" aria-hidden="true">2</div>
+        <div><strong>Reporte CRP de la vigencia (.xlsx)</strong><small id="helpC">Exportado de BogData con el corte del informe (columnas No. Compromiso y Autorización giro).</small></div>
+        <input type="file" id="fileC" accept=".xlsx,.xls,.xlsm" hidden>
+      </div>
+    </div>
+    <p class="note" style="margin:12px 0 0">Los archivos se procesan en este navegador y no se envían a ningún servidor.</p>
+    <div class="msg" id="msg" role="status"></div>
+  </section>
+
+  <section class="kpis" id="kpis" aria-label="Resumen" hidden></section>
+
+  <section class="card">
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" aria-selected="true" data-v="re">Resumen</button>
+      <button class="tab" role="tab" aria-selected="false" data-v="ct">Por contrato</button>
+      <button class="tab" role="tab" aria-selected="false" data-v="al" id="tabAl">Alertas</button>
+      <button class="tab" role="tab" aria-selected="false" data-v="fu" id="tabFu">CRP fuera de la Base</button>
+      <button class="tab" role="tab" aria-selected="false" data-v="me">Metodología</button>
+    </div>
+    <div id="view" style="padding-top:16px"></div>
+    <div class="actions" style="margin-top:16px;border-top:1px solid var(--line);padding-top:14px">
+      <button class="b" id="bb" disabled>Descargar Base diligenciada</button>
+      <button class="b sec" id="bd" disabled>Descargar detalle del cruce</button>
+      <span class="msg" id="amsg" role="status"></span>
+    </div>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="motor.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const fmt = n => Math.round(n || 0).toLocaleString('es-CO');
+const pesos = n => '$ ' + fmt(n);
+const mill = n => '$' + ((n || 0) / 1e6).toLocaleString('es-CO', { maximumFractionDigits: 0 }) + ' M';
+const pct = (a, b) => b ? (a / b * 100).toFixed(1).replace('.', ',') + ' %' : '–';
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const state = { base: null, crp: null, res: null, vista: 're', q: '', soloAlertas: false, abierto: new Set() };
+let downloads = null;
+try { if (window.claude && window.claude.use) window.claude.use('downloads').then(d => { downloads = d; }).catch(() => {}); } catch (e) {}
+function setMsg(t, err) { const m = $('#msg'); m.textContent = t; m.className = 'msg' + (err ? ' err' : ''); }
+
+// ---------- Carga ----------
+function leerArchivo(file) {
+  return new Promise((ok, mal) => { const fr = new FileReader(); fr.onload = e => ok(e.target.result); fr.onerror = () => mal(new Error('No se pudo leer el archivo.')); fr.readAsArrayBuffer(file); });
+}
+async function cargar(tipo, file) {
+  if (typeof XLSX === 'undefined' || typeof JSZip === 'undefined') { setMsg('No se pudieron cargar los lectores de Excel. Revise la conexión a internet y recargue la página.', true); return; }
+  setMsg('Leyendo ' + file.name + '…');
+  try {
+    const buf = await leerArchivo(file);
+    const wb = XLSX.read(new Uint8Array(buf), { type: 'array', cellDates: false });
+    let err = null, hecho = false;
+    for (const n of wb.SheetNames) {
+      const rows = XLSX.utils.sheet_to_json(wb.Sheets[n], { header: 1, raw: true, defval: '' });
+      try {
+        if (tipo === 'B') state.base = { buf, nombre: file.name, hoja: n, datos: MotorPagos.leerBase(rows) };
+        else state.crp = { nombre: file.name, hoja: n, datos: MotorPagos.leerCRP(rows) };
+        hecho = true; break;
+      } catch (x) { err = x; }
+    }
+    if (!hecho) throw err || new Error('El archivo no tiene hojas.');
+    const d = $('#drop' + tipo); d.classList.add('done');
+    d.querySelector('small').textContent = tipo === 'B'
+      ? `${file.name} · hoja «${state.base.hoja}» · ${fmt(state.base.datos.filas.length)} filas · vigencia ${state.base.datos.vigencia || '¿?'}`
+      : `${file.name} · hoja «${state.crp.hoja}» · ${fmt(state.crp.datos.filas.length)} registros`;
+    calcular();
+  } catch (x) { setMsg('No se pudo leer ' + file.name + ': ' + x.message, true); }
+}
+function calcular() {
+  if (!state.base || !state.crp) { setMsg(state.base ? 'Falta cargar el Reporte CRP.' : state.crp ? 'Falta cargar la Base de contratación.' : ''); render(); return; }
+  try { state.res = MotorPagos.cruzar(state.base.datos, state.crp.datos); setMsg(''); }
+  catch (x) { state.res = null; setMsg('No se pudo hacer el cruce: ' + x.message, true); }
+  render();
+}
+for (const t of ['B', 'C']) {
+  const drop = $('#drop' + t), inp = $('#file' + t);
+  drop.onclick = () => inp.click();
+  drop.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); inp.click(); } };
+  inp.onchange = () => { if (inp.files[0]) cargar(t, inp.files[0]); inp.value = ''; };
+  ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+  drop.addEventListener('drop', e => { const f = e.dataTransfer.files[0]; if (f) cargar(t, f); });
+}
+document.querySelectorAll('.tab').forEach(t => t.onclick = () => { state.vista = t.dataset.v; render(); });
+
+// ---------- Vistas ----------
+const cambiadas = () => state.res.filas.filter(f => f.previo != null && Math.abs(f.previo - (f.estado === 'ok' ? f.giro : 0)) > 1);
+function render() {
+  const r = state.res;
+  $('#bb').disabled = $('#bd').disabled = !r;
+  $('#status').innerHTML = r ? `<span class="pill ok">Calculado</span> ${fmt(r.conteo.ok)} de ${fmt(r.total.contratos)} contratos cruzados · corte CRP ${MotorPagos.iso(r.corte) || '–'}` : '';
+  $('#kpis').hidden = !r;
+  if (r) {
+    const t = r.total;
+    $('#kpis').innerHTML = `
+      <div class="kpi"><span>Contratos en la Base</span><b>${fmt(t.contratos)}</b><em>${fmt(t.cruzados)} cruzados con el CRP</em></div>
+      <div class="kpi"><span>Valor comprometido (neto)</span><b>${mill(t.neto)}</b><em>${pesos(t.neto)}</em></div>
+      <div class="kpi"><span>Pagado y girado</span><b>${mill(t.giro)}</b><em>${pct(t.giro, t.neto)} del comprometido</em></div>
+      <div class="kpi"><span>Pendiente de giro</span><b>${mill(t.neto - t.giro)}</b><em>${pesos(t.neto - t.giro)}</em></div>
+      <div class="kpi"><span>Sin giros a la fecha</span><b>${fmt(r.conteo.sinGiro)}</b><em>contratos cruzados con giro $0</em></div>`;
+    const na = r.conteo.noCruza + r.conteo.sinLlave + r.conteo.conAlertas;
+    $('#tabAl').textContent = 'Alertas' + (na ? ' (' + na + ')' : '');
+    $('#tabFu').textContent = 'CRP fuera de la Base' + (r.fuera.length ? ' (' + r.fuera.length + ')' : '');
+  }
+  document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.v === state.vista)));
+  if (state.vista === 'me') return vistaMetodologia();
+  if (!r) { $('#view').innerHTML = `<div class="empty">Cargue la <b>Base de contratación</b> que envía el área y el <b>Reporte CRP</b> de BogData. El módulo trae a la columna «valor pagado y girado a la fecha» la autorización de giro de cada contrato (con sus adiciones) y le devuelve la Base con el mismo formato.</div>`; return; }
+  ({ re: vistaResumen, ct: vistaContratos, al: vistaAlertas, fu: vistaFuera })[state.vista]();
+}
+
+function vistaResumen() {
+  const r = state.res, t = r.total, ch = cambiadas();
+  const fila = (p, cls) => `<tr class="${cls || ''}"><td>${esc(p.tipo)}</td><td class="n">${fmt(p.n)}</td><td class="n">${pesos(p.neto)}</td><td class="n">${pesos(p.giro)}</td><td class="n">${pesos(p.neto - p.giro)}</td><td class="n">${pct(p.giro, p.neto)}</td></tr>`;
+  $('#view').innerHTML = `<p class="q">Contratos de la vigencia ${r.vigencia} de la Base, con lo comprometido y lo girado según el Reporte CRP (corte ${MotorPagos.iso(r.corte) || '–'}). Cada contrato se cuenta una vez, con todas sus adiciones.</p>
+    <div class="tbl"><table><tr><th>Tipo de persona</th><th class="n">Contratos</th><th class="n">Comprometido (neto)</th><th class="n">Pagado y girado</th><th class="n">Pendiente de giro</th><th class="n">% girado</th></tr>
+    ${r.porPersona.map(p => fila(p)).join('')}${fila({ tipo: 'TOTAL', n: t.cruzados, neto: t.neto, giro: t.giro }, 'tot')}</table></div>
+    ${ch.length ? `<p class="note" style="margin-top:12px"><span class="pill warn">${ch.length} contratos</span> tienen en la Base cargada un valor distinto al que calcula el módulo. Véalos en <b>Alertas</b>.</p>` : ''}`;
+}
+
+function vistaContratos() {
+  $('#view').innerHTML = `<div class="toolbar"><label class="f" for="q">Contrato, contratista o documento<input type="search" id="q" placeholder="Ej. 134-2026 o ZAMBRANO" value="${esc(state.q)}"></label>
+    <label class="chk" for="sa"><input type="checkbox" id="sa" ${state.soloAlertas ? 'checked' : ''}> Solo contratos con alertas</label><span class="muted" id="qinfo"></span></div>
+    <p class="q">Haga clic en un contrato para ver los registros del Reporte CRP que se sumaron.</p><div class="tbl" id="qres"></div>`;
+  const q = $('#q'); q.oninput = () => { state.q = q.value; listar(); };
+  $('#sa').onchange = e => { state.soloAlertas = e.target.checked; listar(); };
+  listar();
+}
+function listar() {
+  const s = state.q.trim().toUpperCase();
+  let fs = state.res.filas.filter(f => f.llave);
+  if (state.soloAlertas) fs = fs.filter(f => f.alertas.length || f.estado !== 'ok');
+  if (s) fs = fs.filter(f => f.contrato.toUpperCase().includes(s) || f.llave.includes(s.replace(/^0+/, '')) || f.nombre.toUpperCase().includes(s) || f.doc.includes(s));
+  $('#qinfo').textContent = fmt(fs.length) + ' contratos';
+  if (!fs.length) { $('#qres').innerHTML = `<div class="empty">Ningún contrato coincide con la búsqueda.</div>`; return; }
+  const max = 400, vis = fs.slice(0, max);
+  const filas = vis.map(f => {
+    const ab = state.abierto.has(f.row), ok = f.estado === 'ok';
+    const cambio = f.previo != null && Math.abs(f.previo - (ok ? f.giro : 0)) > 1 ? ` <span class="chg" title="En la Base cargada: ${pesos(f.previo)}">●</span>` : '';
+    let h = `<tr class="clic" tabindex="0" data-k="${f.row}" aria-expanded="${ab}"><td><b>${esc(f.contrato)}</b></td><td class="w">${esc(f.nombre)}</td><td>${esc(f.persona)}</td><td class="n">${ok ? f.ncrp : ''}</td><td class="n">${ok ? pesos(f.neto) : ''}</td><td class="n">${ok ? pesos(f.giro) : '<span class="pill warn">No cruza</span>'}${cambio}</td><td class="n">${ok ? pct(f.giro, f.neto) : ''}</td><td>${f.alertas.length ? `<span class="pill warn">${f.alertas.length} alerta${f.alertas.length > 1 ? 's' : ''}</span>` : ''}</td></tr>`;
+    if (ab) h += `<tr class="det"><td colspan="8">${detalle(f)}</td></tr>`;
+    return h;
+  }).join('');
+  $('#qres').innerHTML = `<table><tr><th>Contrato</th><th>Contratista</th><th>Persona</th><th class="n">CRP</th><th class="n">Comprometido (neto)</th><th class="n">Pagado y girado</th><th class="n">% girado</th><th></th></tr>${filas}</table>
+    ${fs.length > max ? `<p class="note">Se muestran ${max} de ${fmt(fs.length)}. Use la búsqueda para ver los demás.</p>` : ''}
+    <p class="note"><span class="chg">●</span> distinto al valor que traía la Base cargada (pase el cursor para verlo).</p>`;
+  document.querySelectorAll('tr.clic').forEach(tr => {
+    const t = () => { const k = +tr.dataset.k; state.abierto.has(k) ? state.abierto.delete(k) : state.abierto.add(k); listar(); };
+    tr.onclick = t; tr.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); t(); } };
+  });
+}
+function detalle(f) {
+  const al = f.alertas.length ? `<ul class="note" style="margin:0 0 10px">${f.alertas.map(a => `<li>${esc(a)}</li>`).join('')}</ul>` : '';
+  if (f.estado !== 'ok') return al + `<p class="muted" style="margin:0">El No. Compromiso ${esc(f.llave)} no aparece en el Reporte CRP cargado.</p>`;
+  const info = `<p class="muted" style="margin:0 0 6px"><b>Fila ${f.row} de la Base</b> · documento ${esc(f.doc)} · beneficiario en el CRP: ${esc(f.beneficiario)}</p><p class="muted" style="margin:0 0 10px"><b>Objeto:</b> ${esc(f.objeto.slice(0, 260))}${f.objeto.length > 260 ? '…' : ''}</p>`;
+  const regs = f.regs.slice().sort((a, b) => (a.fecha || 0) - (b.fecha || 0));
+  return al + info + `<table><tr><th>Fecha registro</th><th>No. Compromiso</th><th>N° CRP</th><th>Fondo</th><th class="n">Valor CRP</th><th class="n">Anulaciones</th><th class="n">Valor neto</th><th class="n">Autorización giro</th><th class="n">Sin aut. giro</th><th>Objeto</th></tr>
+    ${regs.map(r => `<tr><td>${MotorPagos.iso(r.fecha)}</td><td>${esc(r.nocomp)}</td><td>${esc(r.crp)}</td><td>${esc(r.fondo.slice(0, 28))}</td><td class="n">${pesos(r.vcrp)}</td><td class="n">${pesos(r.anul)}</td><td class="n">${pesos(r.neto)}</td><td class="n">${pesos(r.giro)}</td><td class="n">${pesos(r.sinaut)}</td><td class="w muted">${esc(r.objeto.slice(0, 90))}</td></tr>`).join('')}</table>`;
+}
+
+function vistaAlertas() {
+  const r = state.res, F = r.filas;
+  const g = (titulo, tipo, texto, items, cab) => items.length ? `<div class="grupo"><h3><span class="pill ${tipo}">${items.length}</span>${titulo}</h3><p class="note">${texto}</p><div class="tbl"><table>${cab || ''}${items.join('')}</table></div></div>` : '';
+  const fb = (f, extra) => `<tr><td>Fila ${f.row}</td><td><b>${esc(f.contrato || '—')}</b></td><td class="w">${esc(f.nombre)}</td><td class="w muted">${extra}</td></tr>`;
+  const noCruza = F.filter(f => f.estado === 'no-cruza').map(f => fb(f, esc(f.alertas.join(' · ') || 'Sin registros en el CRP')));
+  const sinLlave = F.filter(f => f.estado === 'sin-llave').map(f => fb(f, esc(f.motivo)));
+  const sinCont = F.filter(f => f.estado === 'sin-contrato' && f.nombre).map(f => fb(f, 'Fila con contratista pero sin número de contrato'));
+  const ch = cambiadas().map(f => `<tr><td>Fila ${f.row}</td><td><b>${esc(f.contrato)}</b></td><td class="w">${esc(f.nombre)}</td><td class="n">${pesos(f.previo)}</td><td class="n">${f.estado === 'ok' ? pesos(f.giro) : '—'}</td><td class="n">${f.estado === 'ok' ? pesos(f.giro - f.previo) : ''}</td></tr>`);
+  const otras = F.filter(f => f.estado === 'ok' && f.alertas.some(a => !a.startsWith('La Base traía'))).map(f => fb(f, f.alertas.filter(a => !a.startsWith('La Base traía')).map(esc).join('<br>')));
+  const html = [
+    g('Contratos que no aparecen en el Reporte CRP', 'warn', 'El número no tiene registros en el reporte. En la Base descargada la celda queda vacía.', noCruza),
+    g('Filas sin número de contrato', 'warn', 'Se dejan como están.', [...sinLlave, ...sinCont]),
+    g('Contratos para revisar', 'warn', 'El valor se calculó, pero conviene confirmarlo en BogData o SECOP II.', otras),
+    g('Valores distintos a los de la Base cargada', 'info', 'La Base que cargó ya traía un valor en la columna de pagos y no coincide con el que sale del Reporte CRP. Suele pasar cuando la Base se diligenció con un corte anterior.', ch,
+      '<tr><th>Fila</th><th>Contrato</th><th>Contratista</th><th class="n">En la Base</th><th class="n">Según el CRP</th><th class="n">Diferencia</th></tr>')
+  ].join('');
+  $('#view').innerHTML = html || `<div class="empty">Sin alertas: todos los contratos de la Base cruzaron con el Reporte CRP.</div>`;
+}
+
+function vistaFuera() {
+  const r = state.res;
+  if (!r.fuera.length) { $('#view').innerHTML = `<div class="empty">Todos los compromisos ${r.vigencia} del Reporte CRP con número de contrato están en la Base.</div>`; return; }
+  $('#view').innerHTML = `<p class="q">Compromisos de la vigencia ${r.vigencia} que están en el Reporte CRP con número de contrato pero no en la Base. Pueden ser contratos que faltan en la Base o contratos de otro tipo que el área no incluye. No se suman al informe.</p>
+    <div class="tbl"><table><tr><th>Contrato</th><th>Beneficiario</th><th class="n">Comprometido (neto)</th><th class="n">Girado</th><th>Objeto</th></tr>
+    ${r.fuera.map(x => `<tr><td><b>${esc(x.llave)}</b></td><td class="w">${esc(x.beneficiario)}</td><td class="n">${pesos(x.neto)}</td><td class="n">${pesos(x.giro)}</td><td class="w muted">${esc(x.objeto.slice(0, 110))}</td></tr>`).join('')}</table></div>`;
+}
+
+function vistaMetodologia() {
+  $('#view').innerHTML = `<div class="note" style="max-width:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px">
+  <div><h3 style="color:var(--ink);font-size:.95rem;margin:0 0 6px">Qué hace</h3>
+  <p>Es la misma regla de la macro <i>CruzarValorGirado</i>: el NUMERO DEL CONTRATO de la Base se cruza con el No. Compromiso del Reporte CRP, y en «valor pagado y girado a la fecha» se escribe la suma de la columna <b>Autorización giro</b> de todos los registros de ese compromiso (CRP inicial y adiciones).</p>
+  <p>La Base se devuelve con su formato y su tabla. Solo cambia esa columna; las demás no se tocan.</p></div>
+  <div><h3 style="color:var(--ink);font-size:.95rem;margin:0 0 6px">Reglas</h3><ol style="padding-left:18px;margin:0">
+    <li><b>Llave:</b> número y año, sin ceros a la izquierda (<i>001-2026</i> = 1-2026). En el reporte, <i>657-20261</i> es el 657-2026.</li>
+    <li><b>Letras:</b> <i>117A-2026</i> es un contrato distinto del 117-2026 y se cruza solo con 117A-2026.</li>
+    <li><b>Solo números con año:</b> los compromisos sin año (honorarios «EDIL 1», facturas de servicios públicos, ARL) no se cruzan.</li>
+    <li><b>«134 DE 2026»:</b> en el reporte esa forma corresponde a resoluciones u otros actos con el mismo número. No se suma al contrato 134-2026; se muestra como alerta.</li>
+    <li><b>Beneficiario:</b> se compara el documento de la Base con el Número Doc. BP Beneficiario del CRP. Si no coincide, se marca alerta (posible cesión o número errado), pero el valor se escribe.</li>
+    <li><b>Contratos que no cruzan:</b> la celda queda vacía, como en la macro, y aparecen en Alertas.</li>
+    <li><b>Comprometido (neto):</b> Valor CRP menos anulaciones. Solo se usa en el resumen y en el detalle; la Base no tiene esa columna.</li>
+  </ol></div></div>`;
+}
+
+// ---------- Descargas ----------
+async function guardar(nombre, data) {
+  const am = $('#amsg'), blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  if (downloads) {
+    try { await downloads.save({ filename: nombre, data: blob }); am.textContent = 'Archivo descargado.'; am.className = 'msg'; }
+    catch (e) { am.textContent = e && e.code === 'declined' ? 'Descarga cancelada.' : 'No se pudo descargar en esta vista.'; am.className = 'msg' + (e && e.code === 'declined' ? '' : ' err'); }
+    return;
+  }
+  try { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = nombre; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); am.textContent = 'Archivo descargado.'; am.className = 'msg'; }
+  catch (e) { am.textContent = 'No se pudo descargar en esta vista.'; am.className = 'msg err'; }
+}
+const nombreBase = () => state.base.nombre.replace(/\.(xlsx|xlsm)$/i, '');
+const sufijo = () => state.res.corte ? '_corte_' + MotorPagos.iso(state.res.corte) : '';
+$('#bb').onclick = async () => {
+  const am = $('#amsg'); am.textContent = 'Preparando la Base…'; am.className = 'msg';
+  try {
+    const zip = await JSZip.loadAsync(state.base.buf);
+    await MotorPagos.diligenciar(zip, state.base.datos, state.res, state.base.hoja);
+    const out = await zip.generateAsync({ type: 'uint8array', compression: 'DEFLATE', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    await guardar(nombreBase() + '_diligenciada' + sufijo() + '.xlsx', out);
+  } catch (e) { am.textContent = 'No se pudo generar la Base: ' + e.message; am.className = 'msg err'; }
+};
+$('#bd').onclick = async () => {
+  const r = state.res, wb = XLSX.utils.book_new(), d = x => x ? MotorPagos.iso(x) : '';
+  const hoja = (aoa, nombre, anchos) => { const ws = XLSX.utils.aoa_to_sheet(aoa); if (aoa.length > 1) ws['!autofilter'] = { ref: XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: aoa.length - 1, c: aoa[0].length - 1 } }) }; if (anchos) ws['!cols'] = anchos.map(w => ({ wch: w })); XLSX.utils.book_append_sheet(wb, ws, nombre); };
+  const t = r.total;
+  hoja([['Tipo de persona', 'Contratos', 'Comprometido (neto)', 'Pagado y girado', 'Pendiente de giro'], ...r.porPersona.map(p => [p.tipo, p.n, p.neto, p.giro, p.neto - p.giro]), ['TOTAL', t.cruzados, t.neto, t.giro, t.neto - t.giro], [], ['Corte del Reporte CRP', d(r.corte)], ['Contratos en la Base', t.contratos], ['No cruzan', r.conteo.noCruza]], 'Resumen', [22, 12, 20, 18, 18]);
+  hoja([['Fila Base', 'Contrato', 'Llave', 'Contratista', 'Tipo de persona', 'Documento', 'Beneficiario CRP', 'N° registros', 'Valor CRP', 'Anulaciones', 'Valor neto', 'Pagado y girado', 'Sin aut. giro', 'Valor que traía la Base', 'Último registro', 'Estado', 'Alertas', 'Objeto'],
+    ...r.filas.map(f => [f.row, f.contrato, f.llave, f.nombre, f.persona, f.doc, f.beneficiario || '', f.regs.length, f.vcrp || 0, f.anul || 0, f.neto || 0, f.estado === 'ok' ? f.giro : '', f.sinaut || 0, f.previo == null ? '' : f.previo, d(f.ultimo), ({ ok: 'Cruzado', 'no-cruza': 'No está en el CRP', 'sin-llave': 'Número no reconocido', 'sin-contrato': 'Sin número' })[f.estado], f.alertas.join(' | '), f.objeto || ''])], 'Contratos', [9, 12, 11, 34, 14, 13, 34, 9, 16, 14, 16, 16, 16, 16, 12, 18, 60, 60]);
+  hoja([['Contrato', 'Beneficiario', 'Valor CRP', 'Valor neto', 'Girado', 'Objeto'], ...r.fuera.map(x => [x.llave, x.beneficiario, x.vcrp, x.neto, x.giro, x.objeto])], 'CRP fuera de la Base', [12, 36, 16, 16, 16, 80]);
+  hoja([['Contrato Base', 'Fila CRP', 'Fecha registro', 'No. Compromiso', 'N° CRP', 'Fondo', 'Beneficiario', 'Doc. beneficiario', 'Valor CRP', 'Anulaciones', 'Valor neto', 'Autorización giro', 'Sin aut. giro', 'Objeto'],
+    ...r.filas.flatMap(f => f.regs.map(x => [f.contrato, x.fila, d(x.fecha), x.nocomp, x.crp, x.fondo, x.benef, x.docBenef, x.vcrp, x.anul, x.neto, x.giro, x.sinaut, x.objeto]))], 'Registros CRP usados', [12, 8, 12, 14, 8, 30, 34, 14, 16, 14, 16, 16, 16, 80]);
+  await guardar('Detalle_cruce_pagos' + sufijo() + '.xlsx', XLSX.write(wb, { type: 'array', bookType: 'xlsx' }));
+};
+render();
+</script>
+</body>
+</html>

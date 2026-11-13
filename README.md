@@ -12,6 +12,7 @@ Abra `index.html` en el navegador (doble clic) o publíquelo con GitHub Pages. L
 |---|---|---|---|
 | Contratación por prestación de servicios | `modulos/contratacion-cps/` | Reporte CRP histórico (.xlsx) | Respuestas 4, 5 y 7 + Metodología + Detalle (.xlsx) |
 | Obligaciones por pagar · Presupuestos participativos | `modulos/oxp-presupuestos-participativos/` | Matriz OXP + Reporte CRP histórico (.xlsx) | Matriz diligenciada con su formato + Detalle del cruce (.xlsx) |
+| Informe mensual de contratación y pagos | `modulos/informe-mensual-pagos/` | Base de contratación del área + Reporte CRP de la vigencia (.xlsx) | Base con «valor pagado y girado a la fecha» diligenciado + Detalle del cruce (.xlsx) |
 
 ### Contratación por prestación de servicios: reglas
 
@@ -32,6 +33,18 @@ En el Reporte CRP el mismo dinero aparece varias veces: el CRP de la vigencia (f
 5. **Saldo:** fórmula de la plantilla (OXP − giros − liberación), comparada con lo pendiente de giro en el reporte.
 6. **Salida:** la matriz se devuelve con su formato, tabla y listas desplegables; solo se reemplazan las celdas calculadas. No se tocan CDP, actas, causas, acciones ni soportes. Los valores son por contrato y se repiten en cada iniciativa.
 
+### Informe mensual de contratación y pagos: reglas
+
+Es la regla de la macro `CruzarValorGirado`, llevada al navegador.
+
+1. **Llave:** número y año de NUMERO DEL CONTRATO, sin ceros a la izquierda (`001-2026` → 1-2026). En el reporte, `657-20261` es el 657-2026.
+2. **Valor pagado y girado a la fecha:** suma de Autorización giro de todos los registros del No. Compromiso (CRP inicial y adiciones).
+3. **Letras:** `117A-2026` es otro contrato y solo cruza con `117A-2026`.
+4. **Solo números con año:** compromisos como `EDIL 1`, facturas de servicios públicos o ARL no se cruzan.
+5. **`134 DE 2026`:** en el reporte esa forma es una resolución u otro acto con el mismo número. No se suma al contrato; se muestra como alerta.
+6. **Beneficiario:** se compara el documento de la Base con el Número Doc. BP Beneficiario. Si no coincide se marca alerta (posible cesión o número errado), pero el valor se escribe.
+7. **Salida:** la Base se devuelve con su formato y su tabla; solo cambia esa columna. Los contratos que no cruzan quedan vacíos. Si la Base ya venía diligenciada, se listan las diferencias.
+
 ## Estructura
 
 ```
@@ -42,9 +55,12 @@ Concejales/
     │   ├── index.html              Interfaz del módulo
     │   ├── motor.js                Reglas de cálculo (sin interfaz)
     │   └── ejemplo.js              Resultado de ejemplo (CRP 13 nov 2026)
-    └── oxp-presupuestos-participativos/
+    ├── oxp-presupuestos-participativos/
+    │   ├── index.html              Interfaz del módulo
+    │   └── motor.js                Cruce matriz OXP + CRP y escritura en la plantilla
+    └── informe-mensual-pagos/
         ├── index.html              Interfaz del módulo
-        └── motor.js                Cruce matriz OXP + CRP y escritura en la plantilla
+        └── motor.js                Cruce Base de contratación + CRP y escritura de la columna de pagos
 ```
 
 ## Agregar un módulo
