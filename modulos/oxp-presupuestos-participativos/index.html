@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Matriz OXP · Presupuestos participativos Usme</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: dos archivos de entrada arriba, resumen, pestañas (vigencia, contrato, alertas, metodología) y descargas */
+:root{
+  --paper:#f5f6f8; --surface:#ffffff; --ink:#152235; --muted:#5b6879; --line:#dde2e9;
+  --accent:#1d4f91; --accent-soft:#e6eef8; --warn:#9a3412; --warn-soft:#fdeee4; --ok:#166534; --ok-soft:#e5f4ea;
+  --body:"Public Sans",system-ui,-apple-system,"Segoe UI",Arial,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0f1722; --surface:#16212f; --ink:#e7ecf3; --muted:#9aa7b8; --line:#2a3748;
+  --accent:#7fb0ee; --accent-soft:#1c2d44; --warn:#f2a374; --warn-soft:#3a2418; --ok:#7fd49a; --ok-soft:#173022; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --paper:#0f1722; --surface:#16212f; --ink:#e7ecf3; --muted:#9aa7b8; --line:#2a3748;
+  --accent:#7fb0ee; --accent-soft:#1c2d44; --warn:#f2a374; --warn-soft:#3a2418; --ok:#7fd49a; --ok-soft:#173022; color-scheme:dark;}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font:15px/1.5 var(--body)}
+.wrap{max-width:1180px;margin:0 auto;padding:24px 20px 48px;display:grid;gap:20px}
+.wrap>*{min-width:0}
+header{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between}
+h1{font:700 1.55rem/1.2 var(--body);margin:0;text-wrap:balance}
+.sub{color:var(--muted);margin:4px 0 0;font-size:.92rem}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px}
+.load{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.drop{border:1.5px dashed var(--line);border-radius:8px;padding:14px 16px;display:flex;gap:14px;align-items:center;cursor:pointer;transition:border-color .15s,background .15s}
+.drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft)}
+.drop.done{border-style:solid;border-color:var(--ok);}
+.drop strong{display:block}
+.drop small{color:var(--muted);display:block}
+.ico{width:38px;height:38px;border-radius:8px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;flex:none;font-weight:700}
+.drop.done .ico{background:var(--ok-soft);color:var(--ok)}
+.status{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:.85rem;color:var(--muted)}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:2px 10px;border-radius:999px;font-size:.78rem;font-weight:600;white-space:nowrap}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.info{background:var(--accent-soft);color:var(--accent)}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.kpi span{display:block;font-size:.78rem;color:var(--muted)}
+.kpi b{display:block;font:600 1.2rem/1.3 var(--mono);font-variant-numeric:tabular-nums;margin-top:4px}
+.kpi em{font-style:normal;font-size:.78rem;color:var(--muted)}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid var(--line)}
+.tab{font:inherit;font-size:.9rem;font-weight:600;padding:9px 14px;border:0;border-bottom:2.5px solid transparent;background:none;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+.tab:hover{color:var(--ink)}
+.q{margin:0 0 12px;font-size:.92rem;color:var(--muted);max-width:80ch}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.86rem}
+th,td{padding:7px 9px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap;vertical-align:top}
+th{font-size:.74rem;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);font-weight:600;background:var(--paper)}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+td.w{white-space:normal;min-width:180px;max-width:340px}
+tr.tot td{font-weight:700;background:var(--accent);color:var(--surface)}
+tr.clic{cursor:pointer}
+tr.clic:hover td{background:var(--accent-soft)}
+tr.det>td{background:var(--paper);padding:10px 12px 14px;white-space:normal}
+tr.det table{font-size:.8rem}
+.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button.b{font:inherit;font-size:.86rem;font-weight:600;padding:7px 14px;border-radius:6px;border:1px solid var(--accent);background:var(--accent);color:var(--surface);cursor:pointer}
+button.b.sec{background:var(--surface);color:var(--accent)}
+button.b:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,input:focus-visible,.drop:focus-visible,tr.clic:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input[type=search]{font:inherit;font-size:.9rem;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);min-width:300px}
+label.f{display:flex;flex-direction:column;font-size:.78rem;color:var(--muted);gap:3px}
+.chk{display:flex;gap:6px;align-items:center;font-size:.85rem}
+.toolbar{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:10px}
+.note{font-size:.84rem;color:var(--muted);max-width:85ch}
+.note li{margin:5px 0}
+.msg{font-size:.85rem}
+.msg:empty{display:none}
+.msg.err{color:var(--warn)}
+.muted{color:var(--muted)}
+.empty{padding:28px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:8px}
+.grupo{margin:0 0 18px}
+.grupo h3{font-size:.95rem;margin:0 0 6px;display:flex;gap:8px;align-items:center}
+.grupo p{margin:0 0 8px}
+.chg{color:var(--warn)}
+.bar{display:flex;height:8px;border-radius:4px;overflow:hidden;background:var(--line);min-width:90px}
+.bar i{display:block;height:100%}
+@media (max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.load{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Matriz de obligaciones por pagar · Presupuestos participativos</h1>
+      <p class="sub">Fondo de Desarrollo Local de Usme · Iniciativas 2022–2025, cruzadas con el Reporte CRP histórico de BogData</p>
+    </div>
+    <div class="status"><a href="../../index.html" style="color:var(--accent)">← Módulos</a><span id="status"></span></div>
+  </header>
+
+  <section class="card" aria-label="Cargar archivos">
+    <div class="load">
+      <div class="drop" id="dropM" tabindex="0" role="button" aria-describedby="helpM">
+        <div class="ico" aria-hidden="true">1</div>
+        <div><strong>Matriz OXP (.xlsx)</strong><small id="helpM">La matriz de iniciativas con la columna NÚMERO CONTRATO diligenciada (versión en blanco o una ya diligenciada).</small></div>
+        <input type="file" id="fileM" accept=".xlsx,.xlsm" hidden>
+      </div>
+      <div class="drop" id="dropC" tabindex="0" role="button" aria-describedby="helpC">
+        <div class="ico" aria-hidden="true">2</div>
+        <div><strong>Reporte CRP histórico (.xlsx)</strong><small id="helpC">Exportado de BogData, con todas las vigencias desde la más antigua de la matriz.</small></div>
+        <input type="file" id="fileC" accept=".xlsx,.xls,.xlsm" hidden>
+      </div>
+    </div>
+    <p class="note" style="margin:12px 0 0">Los archivos se procesan en este navegador y no se envían a ningún servidor.</p>
+    <div class="msg" id="msg" role="status"></div>
+  </section>
+
+  <section class="kpis" id="kpis" aria-label="Resumen" hidden></section>
+
+  <section class="card" id="principal">
+    <div class="tabs" role="tablist" id="tabs">
+      <button class="tab" role="tab" aria-selected="true" data-v="vig">Resumen por vigencia</button>
+      <button class="tab" role="tab" aria-selected="false" data-v="ct">Por contrato</button>
+      <button class="tab" role="tab" aria-selected="false" data-v="al" id="tabAl">Alertas</button>
+      <button class="tab" role="tab" aria-selected="false" data-v="me">Metodología</button>
+    </div>
+    <div id="view" style="padding-top:16px"></div>
+    <div class="actions" style="margin-top:16px;border-top:1px solid var(--line);padding-top:14px">
+      <button class="b" id="bm" disabled>Descargar matriz diligenciada</button>
+      <button class="b sec" id="bd" disabled>Descargar detalle del cruce</button>
+      <span class="msg" id="amsg" role="status"></span>
+    </div>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="motor.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const fmt = n => Math.round(n || 0).toLocaleString('es-CO');
+const pesos = n => '$ ' + fmt(n);
+const mill = n => '$' + ((n || 0) / 1e6).toLocaleString('es-CO', { maximumFractionDigits: 0 }) + ' M';
+const pct = (a, b) => b ? (a / b * 100).toFixed(1).replace('.', ',') + ' %' : '–';
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const state = { matriz: null, crp: null, res: null, vista: 'vig', q: '', soloAlertas: false, abierto: new Set() };
+let downloads = null;
+try { if (window.claude && window.claude.use) window.claude.use('downloads').then(d => { downloads = d; }).catch(() => {}); } catch (e) {}
+
+function setMsg(t, err) { const m = $('#msg'); m.textContent = t; m.className = 'msg' + (err ? ' err' : ''); }
+
+// ---------- Carga ----------
+function leerArchivo(file) {
+  return new Promise((ok, mal) => { const fr = new FileReader(); fr.onload = e => ok(e.target.result); fr.onerror = () => mal(new Error('No se pudo leer el archivo.')); fr.readAsArrayBuffer(file); });
+}
+function hojas(wb) { return wb.SheetNames.map(n => ({ n, rows: XLSX.utils.sheet_to_json(wb.Sheets[n], { header: 1, raw: true, defval: '' }) })); }
+async function cargar(tipo, file) {
+  if (typeof XLSX === 'undefined' || typeof JSZip === 'undefined') { setMsg('No se pudieron cargar los lectores de Excel. Revise la conexión a internet y recargue la página.', true); return; }
+  setMsg('Leyendo ' + file.name + '…');
+  try {
+    const buf = await leerArchivo(file);
+    const wb = XLSX.read(new Uint8Array(buf), { type: 'array', cellDates: false });
+    let err = null, hecho = false;
+    for (const h of hojas(wb)) {
+      try {
+        if (tipo === 'M') { const m = MotorOXP.leerMatriz(h.rows); state.matriz = { buf, nombre: file.name, hoja: h.n, datos: m }; }
+        else { const c = MotorOXP.leerCRP(h.rows); state.crp = { nombre: file.name, hoja: h.n, datos: c }; }
+        hecho = true; break;
+      } catch (x) { err = x; }
+    }
+    if (!hecho) throw err || new Error('El archivo no tiene hojas.');
+    const d = $('#drop' + tipo); d.classList.add('done');
+    d.querySelector('small').textContent = tipo === 'M'
+      ? `${file.name} · hoja «${state.matriz.hoja}» · ${fmt(state.matriz.datos.filas.length)} iniciativas`
+      : `${file.name} · hoja «${state.crp.hoja}» · ${fmt(state.crp.datos.filas.length)} registros`;
+    calcular();
+  } catch (x) { setMsg('No se pudo leer ' + file.name + ': ' + x.message, true); }
+}
+function calcular() {
+  if (!state.matriz || !state.crp) { setMsg(state.matriz ? 'Falta cargar el Reporte CRP histórico.' : state.crp ? 'Falta cargar la Matriz OXP.' : ''); render(); return; }
+  try { state.res = MotorOXP.cruzar(state.matriz.datos, state.crp.datos); setMsg(''); }
+  catch (x) { state.res = null; setMsg('No se pudo hacer el cruce: ' + x.message, true); }
+  render();
+}
+for (const t of ['M', 'C']) {
+  const drop = $('#drop' + t), inp = $('#file' + t);
+  drop.onclick = () => inp.click();
+  drop.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); inp.click(); } };
+  inp.onchange = () => { if (inp.files[0]) cargar(t, inp.files[0]); inp.value = ''; };
+  ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+  drop.addEventListener('drop', e => { const f = e.dataTransfer.files[0]; if (f) cargar(t, f); });
+}
+document.querySelectorAll('.tab').forEach(t => t.onclick = () => { state.vista = t.dataset.v; render(); });
+
+// ---------- Vistas ----------
+function totales() {
+  const t = { n: 0, ini: 0, crp: 0, oxp: 0, giros: 0, lib: 0, saldo: 0 };
+  for (const v of state.res.vigencias) for (const k in t) t[k] += v[k];
+  return t;
+}
+function render() {
+  const r = state.res;
+  $('#bm').disabled = $('#bd').disabled = !r;
+  $('#status').innerHTML = r ? `<span class="pill ok">Calculado</span> ${fmt(r.conteo.ok)} de ${fmt(r.conteo.conContrato)} iniciativas con contrato cruzadas` : '';
+  $('#kpis').hidden = !r;
+  if (r) {
+    const t = totales();
+    $('#kpis').innerHTML = `
+      <div class="kpi"><span>Contratos cruzados</span><b>${fmt(t.n)}</b><em>${fmt(t.ini)} iniciativas</em></div>
+      <div class="kpi"><span>OXP constituida al 31/12</span><b>${mill(t.oxp)}</b><em>${pesos(t.oxp)}</em></div>
+      <div class="kpi"><span>Giros de la OXP</span><b>${mill(t.giros)}</b><em>${pct(t.giros, t.oxp)} de la OXP</em></div>
+      <div class="kpi"><span>Liberado o fenecido</span><b>${mill(t.lib)}</b><em>${pct(t.lib, t.oxp)} de la OXP</em></div>
+      <div class="kpi"><span>Saldo por girar</span><b>${mill(t.saldo)}</b><em>${pesos(t.saldo)}</em></div>`;
+    const na = r.conteo.noCruza + r.conteo.sinLlave + r.conteo.conAlertas;
+    $('#tabAl').textContent = 'Alertas' + (na ? ' (' + na + ')' : '');
+  }
+  document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.v === state.vista)));
+  if (state.vista === 'me') return vistaMetodologia();
+  if (!r) { $('#view').innerHTML = `<div class="empty">Cargue la <b>Matriz OXP</b> y el <b>Reporte CRP histórico</b>. El módulo identifica el contrato de cada iniciativa, trae del reporte el CRP, la OXP constituida, los giros y las liberaciones, y le devuelve la matriz diligenciada con el mismo formato y las mismas listas desplegables.</div>`; return; }
+  if (state.vista === 'vig') vistaVigencia(); else if (state.vista === 'ct') vistaContratos(); else vistaAlertas();
+}
+
+function vistaVigencia() {
+  const r = state.res, t = totales();
+  const fila = (v, cls) => `<tr class="${cls || ''}"><td>${v.anio}</td><td class="n">${fmt(v.n)}</td><td class="n">${fmt(v.ini)}</td><td class="n">${pesos(v.crp)}</td><td class="n">${pesos(v.oxp)}</td><td class="n">${pesos(v.giros)}</td><td class="n">${pesos(v.lib)}</td><td class="n">${pesos(v.saldo)}</td><td class="n">${pct(v.giros, v.oxp)}</td><td>${cls ? '' : barra(v)}</td></tr>`;
+  $('#view').innerHTML = `<p class="q">Obligaciones por pagar constituidas al 31 de diciembre de cada vigencia por los contratos que ejecutan iniciativas de presupuestos participativos. Cada contrato se cuenta una sola vez, aunque ejecute varias iniciativas.</p>
+    <div class="tbl"><table><tr><th>Vigencia OXP</th><th class="n">Contratos</th><th class="n">Iniciativas</th><th class="n">Valor CRP</th><th class="n">OXP constituida 31/12</th><th class="n">Giros OXP</th><th class="n">Liberado / fenecido</th><th class="n">Saldo</th><th class="n">% girado</th><th>Composición de la OXP</th></tr>
+    ${r.vigencias.map(v => fila(v)).join('')}${fila(Object.assign({ anio: 'TOTAL' }, t), 'tot')}</table></div>
+    <p class="note" style="margin-top:10px"><span style="color:var(--accent)">■</span> girado &nbsp; <span style="color:#b9770e">■</span> liberado o fenecido &nbsp; <span style="color:var(--warn)">■</span> saldo por girar. En la matriz descargada, los valores de un contrato se repiten en cada una de sus iniciativas: no sume esas columnas hacia abajo.</p>`;
+}
+function barra(v) {
+  const tot = Math.max(1, v.oxp), w = x => Math.max(0, x) / tot * 100;
+  return `<div class="bar" title="Girado ${pct(v.giros, v.oxp)} · liberado ${pct(v.lib, v.oxp)} · saldo ${pct(v.saldo, v.oxp)}"><i style="width:${w(v.giros)}%;background:var(--accent)"></i><i style="width:${w(v.lib)}%;background:#b9770e"></i><i style="width:${w(v.saldo)}%;background:var(--warn)"></i></div>`;
+}
+
+function vistaContratos() {
+  $('#view').innerHTML = `<div class="toolbar"><label class="f" for="q">Contrato, iniciativa u objeto<input type="search" id="q" placeholder="Ej. 658-2022 o 15929" value="${esc(state.q)}"></label>
+    <label class="chk" for="sa"><input type="checkbox" id="sa" ${state.soloAlertas ? 'checked' : ''}> Solo contratos con alertas</label><span class="muted" id="qinfo"></span></div>
+    <p class="q">Haga clic en un contrato para ver sus iniciativas y los registros del Reporte CRP que se usaron (VA = vigencia, RB = obligación por pagar).</p><div class="tbl" id="qres"></div>`;
+  const q = $('#q'); q.oninput = () => { state.q = q.value; listar(); };
+  $('#sa').onchange = e => { state.soloAlertas = e.target.checked; listar(); };
+  listar();
+}
+function listar() {
+  const s = state.q.trim().toUpperCase();
+  let cs = state.res.contratos;
+  if (state.soloAlertas) cs = cs.filter(c => c.alertas.length);
+  if (s) cs = cs.filter(c => c.llave.includes(s.replace(/^0+/, '')) || c.objeto.toUpperCase().includes(s) || c.iniciativas.some(f => f.idIni.includes(s) || f.nombre.toUpperCase().includes(s) || f.contrato.toUpperCase().includes(s)));
+  $('#qinfo').textContent = fmt(cs.length) + ' contratos';
+  if (!cs.length) { $('#qres').innerHTML = `<div class="empty">Ningún contrato coincide con la búsqueda.</div>`; return; }
+  const filas = cs.map(c => {
+    const prev = c.iniciativas.find(f => f.tienePrevio);
+    const cambio = k => prev && Math.abs(prev.previo[k] - c[k]) > 1 ? ` <span class="chg" title="En la matriz cargada: ${pesos(prev.previo[k])}">●</span>` : '';
+    const ab = state.abierto.has(c.llave);
+    let h = `<tr class="clic" tabindex="0" data-k="${c.llave}" aria-expanded="${ab}"><td><b>${c.llave}</b></td><td class="n">${c.iniciativas.length}</td><td class="n">${pesos(c.crp)}${cambio('crp')}</td><td class="n">${pesos(c.oxp)}${cambio('oxp')}</td><td class="n">${pesos(c.giros)}${cambio('giros')}</td><td class="n">${pesos(c.lib)}${cambio('lib')}</td><td class="n">${pesos(c.saldo)}</td><td>${esc(c.estado)}</td><td>${c.alertas.length ? `<span class="pill warn">${c.alertas.length} alerta${c.alertas.length > 1 ? 's' : ''}</span>` : ''}</td></tr>`;
+    if (ab) h += `<tr class="det"><td colspan="9">${detalle(c, prev)}</td></tr>`;
+    return h;
+  }).join('');
+  $('#qres').innerHTML = `<table><tr><th>Contrato</th><th class="n">Iniciativas</th><th class="n">Valor CRP</th><th class="n">OXP 31/12</th><th class="n">Giros OXP</th><th class="n">Liberado / fenecido</th><th class="n">Saldo</th><th>Estado OXP</th><th></th></tr>${filas}</table>
+    <p class="note"><span class="chg">●</span> el valor es distinto al que traía la matriz cargada (pase el cursor para verlo).</p>`;
+  document.querySelectorAll('tr.clic').forEach(tr => {
+    const t = () => { const k = tr.dataset.k; state.abierto.has(k) ? state.abierto.delete(k) : state.abierto.add(k); listar(); };
+    tr.onclick = t; tr.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); t(); } };
+  });
+}
+function detalle(c, prev) {
+  const al = c.alertas.length ? `<ul class="note" style="margin:0 0 10px">${c.alertas.map(a => `<li>${esc(a)}</li>`).join('')}</ul>` : '';
+  const ini = `<p class="muted" style="margin:0 0 6px"><b>Objeto:</b> ${esc(c.objeto.slice(0, 260))}${c.objeto.length > 260 ? '…' : ''}</p>
+    <p class="muted" style="margin:0 0 10px"><b>Iniciativas:</b> ${c.iniciativas.map(f => `${esc(f.idIni)} · ${esc(f.nombre.slice(0, 70))} (fila ${f.row})`).join('; ')}</p>`;
+  const pv = prev ? `<p class="muted" style="margin:0 0 10px"><b>En la matriz cargada:</b> CRP ${pesos(prev.previo.crp)} · OXP ${pesos(prev.previo.oxp)} · giros ${pesos(prev.previo.giros)} · liberación ${pesos(prev.previo.lib)} · saldo ${pesos(prev.previo.saldo)}</p>` : '';
+  const regs = c.regs.slice().sort((a, b) => a.ejercicio - b.ejercicio || (a.rb - b.rb) || ((a.fecha || 0) - (b.fecha || 0)));
+  const tabla = `<table><tr><th>Ejercicio</th><th>Fondo</th><th>Fecha registro</th><th>No. Compromiso</th><th>N° CRP</th><th class="n">Valor CRP</th><th class="n">Anulaciones</th><th class="n">Giros</th><th class="n">Sin autorizar giro</th><th>Uso en la matriz</th></tr>
+    ${regs.map(r => `<tr><td>${r.ejercicio}</td><td><span class="pill ${r.rb ? 'info' : 'ok'}">${r.rb ? 'RB' : 'VA'}</span></td><td>${MotorOXP.iso(r.fecha)}</td><td>${esc(r.nocomp)}</td><td>${esc(r.crp)}</td><td class="n">${pesos(r.vcrp)}</td><td class="n">${pesos(r.anul)}</td><td class="n">${pesos(r.giro)}</td><td class="n">${pesos(r.sinaut)}</td><td class="muted">${uso(r, c)}</td></tr>`).join('')}</table>`;
+  return al + ini + pv + tabla;
+}
+function uso(r, c) {
+  if (!r.rb) return r.ejercicio === c.anio ? (c.abierta ? 'CRP (vigencia abierta)' : 'CRP y OXP 31/12') : 'No se suma (otra vigencia)';
+  return 'Giros y liberaciones' + (r.ejercicio === c.ultimoEjRB && c.fenecido ? ' · saldo fenecido' : '');
+}
+
+function vistaAlertas() {
+  const r = state.res, F = r.filas;
+  const g = (titulo, tipo, texto, items) => items.length ? `<div class="grupo"><h3><span class="pill ${tipo}">${items.length}</span>${titulo}</h3><p class="note">${texto}</p><div class="tbl"><table>${items.join('')}</table></div></div>` : '';
+  const filaIni = f => `<tr><td>Fila ${f.row}</td><td>${esc(f.idIni)}</td><td class="w">${esc(f.nombre.slice(0, 90))}</td><td class="w" title="${esc(f.contrato)}">${esc(f.contrato.length > 70 ? f.contrato.slice(0, 70) + '…' : f.contrato)}</td><td><b>${esc(f.llave || '—')}</b></td><td class="w muted">${esc(f.motivo)}</td></tr>`;
+  const sinLlave = F.filter(f => f.estadoCruce === 'sin-llave').map(filaIni);
+  const noCruza = F.filter(f => f.estadoCruce === 'no-cruza').map(filaIni);
+  const conAl = r.contratos.filter(c => c.alertas.length).map(c => `<tr><td><b>${c.llave}</b></td><td class="n">${c.iniciativas.length} inic.</td><td class="w">${c.alertas.map(esc).join('<br>')}</td></tr>`);
+  const llaves = F.filter(f => f.motivo && f.llave).map(filaIni);
+  const dif = F.filter(f => f.llaveDifiere).map(f => `<tr><td>Fila ${f.row}</td><td>${esc(f.contrato)}</td><td>En la matriz: <b>${esc(f.llaveExistente)}</b></td><td>Calculada: <b>${esc(f.llave)}</b></td></tr>`);
+  const html = [
+    g('Contratos que no aparecen en el Reporte CRP', 'warn', 'La llave no tiene registros en el reporte. Revise el número en la matriz o en BogData. En la matriz descargada quedan con estado «Por validar».', noCruza),
+    g('Iniciativas sin número de contrato reconocible', 'warn', 'La celda NÚMERO CONTRATO trae un texto sin número. Quedan con estado «Por validar».', sinLlave),
+    g('Contratos con alertas del cruce', 'warn', 'El cálculo se hizo, pero conviene revisarlo contra BogData.', conAl),
+    g('Llave distinta a la que ya traía la matriz', 'info', 'La matriz tiene una columna de contrato estandarizado que no coincide con la que calcula el módulo.', dif),
+    g('Números de contrato ajustados', 'info', 'La llave se obtuvo con una regla de limpieza. Confirme que el contrato es el correcto.', llaves)
+  ].join('');
+  $('#view').innerHTML = html || `<div class="empty">Sin alertas: todas las iniciativas con contrato cruzaron y los saldos cuadran con el reporte.</div>`;
+}
+
+function vistaMetodologia() {
+  const cambios = state.res ? state.res.conteo.cambios : 0;
+  $('#view').innerHTML = `<div class="note" style="max-width:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px">
+  <div><h3 style="color:var(--ink);font-size:.95rem;margin:0 0 6px">Por qué se separa por fondo</h3>
+  <p>En el Reporte CRP el mismo dinero aparece varias veces: el CRP de la vigencia (fondo <b>VA</b>) se vuelve a registrar el año siguiente como obligación por pagar (fondo <b>RB</b>), y lo que no se gira se registra otra vez el año después. Sumar la columna Valor CRP de todos los años cuenta la misma plata dos o tres veces.</p>
+  <p>Ejemplo 658-2022: CRP 2022 de $433.422.858 (VA), registrado otra vez en 2023 (RB) y el saldo de $198.908.003 de nuevo en 2024 (RB). Total sumando todo: $1.065.753.719. Valor real del compromiso: $433.422.858, girado $432.846.690 y liberado $576.168.</p>
+  ${state.res && cambios ? `<p><span class="pill warn">${cambios} iniciativas</span> cambian frente a los valores que traía la matriz cargada.</p>` : ''}</div>
+  <div><h3 style="color:var(--ink);font-size:.95rem;margin:0 0 6px">Reglas por columna</h3><ol style="padding-left:18px;margin:0">
+    <li><b>Contrato:</b> de NÚMERO CONTRATO se toma número y año (<i>CIA 679 DE 2025</i> → 679-2025, <i>FDLU-SUM-1226-2024 (121505)</i> → 1226-2024). Si no trae año, se usa la vigencia de la iniciativa; si hay varios contratos en la celda, el primero. En el reporte, <i>657-20231</i> es el mismo contrato 657-2023.</li>
+    <li><b>Año de suscripción y vigencia OXP:</b> el año del contrato.</li>
+    <li><b>Valor CRP:</b> suma de Valor CRP de los registros VA del año del contrato.</li>
+    <li><b>OXP constituida 31/12:</b> suma de Com. sin aut. giro de esos mismos registros VA (lo que quedó sin girar al cierre).</li>
+    <li><b>Giros OXP:</b> suma de Autorización de giro de los registros RB del contrato.</li>
+    <li><b>Monto liberación / fenecimiento:</b> anulaciones de los registros RB, más lo que quedó sin girar en el último año de reserva si ese año ya cerró y no se volvió a registrar (fenecido).</li>
+    <li><b>Saldo:</b> la fórmula de la plantilla (OXP − giros − liberación). Se compara con lo pendiente de giro en el reporte y, si no cuadra, se marca alerta.</li>
+    <li><b>Fecha corte de giros:</b> la fecha de registro más reciente del contrato en el reporte.</li>
+    <li><b>Tipo de anulación:</b> No aplica (sin liberación), Liberación (anulaciones), Fenecimiento (saldo no girado al cierre) o Por validar (ambas).</li>
+    <li><b>Estado OXP:</b> Sin OXP constituida, Con saldo pendiente, Girada parcialmente, Girada totalmente, Liberada o Fenecida, según los valores anteriores.</li>
+    <li><b>Objeto contractual:</b> el objeto del CRP de mayor valor, solo si la celda está vacía.</li>
+    <li><b>No se modifican:</b> CDP (el reporte CRP no trae su valor), valor total y fechas del contrato, actas, causas, acciones y soportes.</li>
+  </ol></div></div>`;
+}
+
+// ---------- Descargas ----------
+async function guardar(nombre, data) {
+  const am = $('#amsg'), blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  if (downloads) {
+    try { await downloads.save({ filename: nombre, data: blob }); am.textContent = 'Archivo descargado.'; am.className = 'msg'; }
+    catch (e) { am.textContent = e && e.code === 'declined' ? 'Descarga cancelada.' : 'No se pudo descargar en esta vista.'; am.className = 'msg' + (e && e.code === 'declined' ? '' : ' err'); }
+    return;
+  }
+  try { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = nombre; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); am.textContent = 'Archivo descargado.'; am.className = 'msg'; }
+  catch (e) { am.textContent = 'No se pudo descargar en esta vista.'; am.className = 'msg err'; }
+}
+const base = () => state.matriz.nombre.replace(/\.(xlsx|xlsm)$/i, '');
+$('#bm').onclick = async () => {
+  const am = $('#amsg'); am.textContent = 'Preparando la matriz…'; am.className = 'msg';
+  try {
+    const zip = await JSZip.loadAsync(state.matriz.buf);
+    await MotorOXP.diligenciar(zip, state.matriz.datos, state.res, state.matriz.hoja);
+    const out = await zip.generateAsync({ type: 'uint8array', compression: 'DEFLATE', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    await guardar(base() + '_diligenciada.xlsx', out);
+  } catch (e) { am.textContent = 'No se pudo generar la matriz: ' + e.message; am.className = 'msg err'; }
+};
+$('#bd').onclick = async () => {
+  const r = state.res, wb = XLSX.utils.book_new(), d = x => x ? MotorOXP.iso(x) : '';
+  const hoja = (aoa, nombre, anchos) => { const ws = XLSX.utils.aoa_to_sheet(aoa); ws['!autofilter'] = { ref: XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: aoa.length - 1, c: aoa[0].length - 1 } }) }; if (anchos) ws['!cols'] = anchos.map(w => ({ wch: w })); XLSX.utils.book_append_sheet(wb, ws, nombre); };
+  hoja([['Vigencia OXP', 'Contratos', 'Iniciativas', 'Valor CRP', 'OXP constituida 31/12', 'Giros OXP', 'Liberado / fenecido', 'Saldo'],
+    ...r.vigencias.map(v => [v.anio, v.n, v.ini, v.crp, v.oxp, v.giros, v.lib, v.saldo])], 'Resumen', [14, 11, 11, 18, 20, 18, 18, 16]);
+  hoja([['Contrato', 'Año', 'Iniciativas', 'Valor CRP', 'Anulaciones vigencia', 'OXP constituida 31/12', 'Giros OXP', 'Anulaciones OXP', 'Fenecido', 'Liberado / fenecido', 'Saldo', 'Pendiente en el reporte', 'Fecha corte', 'Tipo de anulación', 'Estado OXP', 'Alertas', 'Objeto'],
+    ...r.contratos.map(c => [c.llave, c.anio, c.iniciativas.length, c.crp, c.anulVA, c.oxp, c.giros, c.anulRB, c.fenecido, c.lib, c.saldo, c.pendiente, d(c.fcorte), c.tipoanul, c.estado, c.alertas.join(' | '), c.objeto])], 'Contratos', [12, 6, 10, 16, 14, 16, 16, 14, 14, 16, 14, 16, 12, 16, 20, 60, 60]);
+  hoja([['Fila matriz', 'Vigencia iniciativa', 'ID iniciativa', 'Nombre', 'Número contrato (matriz)', 'Llave', 'Nota de la llave', 'Resultado del cruce', 'CRP calculado', 'OXP calculada', 'Giros calculados', 'Liberación calculada', 'CRP en la matriz', 'OXP en la matriz', 'Giros en la matriz', 'Liberación en la matriz'],
+    ...r.filas.map(f => [f.row, f.vig, f.idIni, f.nombre, f.contrato, f.llave, f.motivo, { ok: 'Cruzó', 'no-cruza': 'No aparece en el reporte', 'sin-llave': 'Sin número reconocible', 'sin-contrato': 'Sin contrato' }[f.estadoCruce],
+      f.c ? f.c.crp : '', f.c ? f.c.oxp : '', f.c ? f.c.giros : '', f.c ? f.c.lib : '', f.tienePrevio ? f.previo.crp : '', f.tienePrevio ? f.previo.oxp : '', f.tienePrevio ? f.previo.giros : '', f.tienePrevio ? f.previo.lib : ''])], 'Iniciativas', [10, 10, 12, 50, 28, 12, 40, 22, 16, 16, 16, 16, 16, 16, 16, 16]);
+  const regs = [['Contrato', 'Ejercicio', 'Fondo', 'Tipo', 'Fecha registro', 'No. Compromiso', 'N° CRP', 'Valor CRP', 'Anulaciones', 'Valor neto', 'Giros', 'Com. sin aut. giro', 'Uso', 'Fila del reporte']];
+  for (const c of r.contratos) for (const x of c.regs) regs.push([c.llave, x.ejercicio, x.fondo, x.rb ? 'RB' : 'VA', d(x.fecha), x.nocomp, x.crp, x.vcrp, x.anul, x.neto, x.giro, x.sinaut, uso(x, c), x.fila]);
+  hoja(regs, 'Registros CRP', [12, 9, 30, 6, 12, 16, 10, 16, 14, 16, 16, 16, 28, 10]);
+  const met = [['Metodología del cruce'], ['Matriz: ' + state.matriz.nombre], ['Reporte CRP: ' + state.crp.nombre + ' (' + fmt(r.registrosCRP) + ' registros, último ejercicio ' + r.maxEj + ')'], ['Generado: ' + new Date().toLocaleString('es-CO')], [''],
+    ['1. Llave del contrato: número y año de NÚMERO CONTRATO; si no trae año, la vigencia de la iniciativa; si hay varios, el primero. En el reporte, 657-20231 = 657-2023.'],
+    ['2. Valor CRP = suma de Valor CRP de los registros de fondo VA del año del contrato.'],
+    ['3. OXP constituida 31/12 = suma de Com. sin aut. giro de esos registros VA.'],
+    ['4. Giros OXP = suma de Autorización de giro de los registros de fondo RB.'],
+    ['5. Liberación / fenecimiento = anulaciones RB + saldo sin girar del último año de reserva si ya cerró y no se volvió a registrar.'],
+    ['6. Saldo = OXP − giros − liberación (fórmula de la plantilla); se compara con lo pendiente de giro en el reporte.'],
+    ['7. Los valores son por contrato y se repiten en cada iniciativa del mismo contrato: no se suman hacia abajo en la matriz.'],
+    ['8. No se modifican CDP, valor total y fechas del contrato, actas, causas, acciones ni soportes.']];
+  const wm = XLSX.utils.aoa_to_sheet(met); wm['!cols'] = [{ wch: 130 }]; XLSX.utils.book_append_sheet(wb, wm, 'Metodología');
+  await guardar(base() + '_detalle_cruce.xlsx', XLSX.write(wb, { bookType: 'xlsx', type: 'array' }));
+};
+render();
+</script>
+</body>
+</html>
