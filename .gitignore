@@ -1,0 +1,9 @@
+# Reportes de BogData y salidas: no se suben al repositorio
+*.xlsx
+*.xls
+*.xlsm
+*.csv
+~$*
+.DS_Store
+Thumbs.db
+node_modules/

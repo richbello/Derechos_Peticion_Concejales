@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Concejales · Informes FDL Usme</title>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* Portal: lista de módulos de informes para respuestas al Concejo */
+:root{--paper:#f5f6f8;--surface:#fff;--ink:#152235;--muted:#5b6879;--line:#dde2e9;--accent:#1d4f91;--accent-soft:#e6eef8;--font:"Public Sans",system-ui,"Segoe UI",Arial,sans-serif;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#0f1722;--surface:#16212f;--ink:#e7ecf3;--muted:#9aa7b8;--line:#2a3748;--accent:#7fb0ee;--accent-soft:#1c2d44;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#0f1722;--surface:#16212f;--ink:#e7ecf3;--muted:#9aa7b8;--line:#2a3748;--accent:#7fb0ee;--accent-soft:#1c2d44;color-scheme:dark}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 var(--font)}
+.wrap{max-width:960px;margin:0 auto;padding:32px 20px;display:grid;gap:20px}
+h1{margin:0;font-size:1.6rem}
+p{margin:4px 0 0;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+a.mod{display:grid;gap:6px;padding:18px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);text-decoration:none}
+a.mod:hover,a.mod:focus-visible{border-color:var(--accent);outline:none}
+a.mod b{color:var(--accent)}
+a.mod small{color:var(--muted)}
+.soon{padding:18px;border:1px dashed var(--line);border-radius:10px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><h1>Concejales</h1><p>Informes del Fondo de Desarrollo Local de Usme para responder derechos de petición del Concejo, a partir de los reportes de BogData.</p></header>
+  <div class="grid">
+    <a class="mod" href="modulos/contratacion-cps/index.html"><b>Contratación por prestación de servicios</b><span>Comprometido, girado y número de contratos de servicios profesionales y de apoyo a la gestión, por vigencia.</span><small>Entrada: Reporte CRP histórico (.xlsx)</small></a>
+    <div class="soon">Próximo módulo</div>
+  </div>
+</div>
+</body>
+</html>
