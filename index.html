@@ -3,32 +3,378 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Concejales · Informes FDL Usme</title>
-<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<title>Informe CPS Usme</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* Portal: lista de módulos de informes para respuestas al Concejo */
-:root{--paper:#f5f6f8;--surface:#fff;--ink:#152235;--muted:#5b6879;--line:#dde2e9;--accent:#1d4f91;--accent-soft:#e6eef8;--font:"Public Sans",system-ui,"Segoe UI",Arial,sans-serif;color-scheme:light}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#0f1722;--surface:#16212f;--ink:#e7ecf3;--muted:#9aa7b8;--line:#2a3748;--accent:#7fb0ee;--accent-soft:#1c2d44;color-scheme:dark}}
-:root[data-theme="dark"]{--paper:#0f1722;--surface:#16212f;--ink:#e7ecf3;--muted:#9aa7b8;--line:#2a3748;--accent:#7fb0ee;--accent-soft:#1c2d44;color-scheme:dark}
-body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 var(--font)}
-.wrap{max-width:960px;margin:0 auto;padding:32px 20px;display:grid;gap:20px}
-h1{margin:0;font-size:1.6rem}
-p{margin:4px 0 0;color:var(--muted)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
-a.mod{display:grid;gap:6px;padding:18px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);text-decoration:none}
-a.mod:hover,a.mod:focus-visible{border-color:var(--accent);outline:none}
-a.mod b{color:var(--accent)}
-a.mod small{color:var(--muted)}
-.soon{padding:18px;border:1px dashed var(--line);border-radius:10px;color:var(--muted)}
+/* Layout: barra de carga arriba, resumen por vigencia, pestañas por pregunta del derecho de petición, tabla + gráfico */
+:root{
+  --paper:#f5f6f8; --surface:#ffffff; --ink:#152235; --muted:#5b6879; --line:#dde2e9;
+  --accent:#1d4f91; --accent-soft:#e6eef8; --prof:#1d4f91; --apoyo:#b9770e; --warn:#9a3412; --warn-soft:#fdeee4; --ok:#166534; --ok-soft:#e5f4ea;
+  --display:"Public Sans",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  --body:"Public Sans",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0f1722; --surface:#16212f; --ink:#e7ecf3; --muted:#9aa7b8; --line:#2a3748;
+  --accent:#7fb0ee; --accent-soft:#1c2d44; --prof:#7fb0ee; --apoyo:#e6a94a; --warn:#f2a374; --warn-soft:#3a2418; --ok:#7fd49a; --ok-soft:#173022; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --paper:#0f1722; --surface:#16212f; --ink:#e7ecf3; --muted:#9aa7b8; --line:#2a3748;
+  --accent:#7fb0ee; --accent-soft:#1c2d44; --prof:#7fb0ee; --apoyo:#e6a94a; --warn:#f2a374; --warn-soft:#3a2418; --ok:#7fd49a; --ok-soft:#173022; color-scheme:dark;}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font:15px/1.5 var(--body)}
+.wrap{max-width:1180px;margin:0 auto;padding:24px 20px 48px;display:grid;gap:20px}
+header{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between}
+h1{font:700 1.55rem/1.2 var(--display);margin:0;text-wrap:balance}
+.sub{color:var(--muted);margin:4px 0 0;font-size:.92rem}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px}
+.load{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center}
+.drop{border:1.5px dashed var(--line);border-radius:8px;padding:14px 16px;display:flex;gap:14px;align-items:center;cursor:pointer;transition:border-color .15s,background .15s}
+.drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft)}
+.drop strong{display:block}
+.drop small{color:var(--muted)}
+.ico{width:38px;height:38px;border-radius:8px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;flex:none}
+.opts{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+label.f{display:flex;flex-direction:column;font-size:.78rem;color:var(--muted);gap:3px}
+select,input[type=search]{font:inherit;font-size:.9rem;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink)}
+.chk{display:flex;gap:6px;align-items:center;font-size:.85rem}
+.status{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:.85rem;color:var(--muted)}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:2px 10px;border-radius:999px;font-size:.78rem;font-weight:600;border:1px solid transparent}
+.pill.ej{background:var(--warn-soft);color:var(--warn)}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.kpi span{display:block;font-size:.78rem;color:var(--muted)}
+.kpi b{display:block;font:600 1.25rem/1.3 var(--mono);font-variant-numeric:tabular-nums;margin-top:4px}
+.kpi em{font-style:normal;font-size:.78rem;color:var(--muted)}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid var(--line)}
+.tab{font:inherit;font-size:.9rem;font-weight:600;padding:9px 14px;border:0;border-bottom:2.5px solid transparent;background:none;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+.tab:hover{color:var(--ink)}
+.panel{display:grid;grid-template-columns:minmax(0,2.1fr) minmax(260px,1fr);gap:18px;align-items:start}
+.q{margin:0 0 12px;font-size:.92rem;color:var(--muted);max-width:70ch}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.86rem}
+th,td{padding:7px 9px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+th{font-size:.74rem;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);font-weight:600;background:var(--paper)}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+tr.sub td{font-weight:700;background:var(--accent-soft)}
+tr.tot td{font-weight:700;background:var(--accent);color:var(--surface)}
+.dot{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+button.b{font:inherit;font-size:.86rem;font-weight:600;padding:7px 14px;border-radius:6px;border:1px solid var(--accent);background:var(--accent);color:var(--surface);cursor:pointer}
+button.b.sec{background:var(--surface);color:var(--accent)}
+button.b:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,select:focus-visible,input:focus-visible,.drop:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.chart svg{width:100%;height:auto;display:block}
+.chart text{fill:var(--muted);font:11px var(--body)}
+.legend{display:flex;gap:14px;font-size:.8rem;color:var(--muted);margin-top:6px}
+.note{font-size:.82rem;color:var(--muted);max-width:75ch}
+.note li{margin:3px 0}
+.msg{font-size:.85rem}
+.msg:empty{display:none}
+.msg.err{color:var(--warn)}
+.full{grid-column:1/-1}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:10px}
+.muted{color:var(--muted)}
+.empty{padding:24px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:8px}
+@media (max-width:860px){.panel{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}.load{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header><h1>Concejales</h1><p>Informes del Fondo de Desarrollo Local de Usme para responder derechos de petición del Concejo, a partir de los reportes de BogData.</p></header>
-  <div class="grid">
-    <a class="mod" href="modulos/contratacion-cps/index.html"><b>Contratación por prestación de servicios</b><span>Comprometido, girado y número de contratos de servicios profesionales y de apoyo a la gestión, por vigencia.</span><small>Entrada: Reporte CRP histórico (.xlsx)</small></a>
-    <div class="soon">Próximo módulo</div>
-  </div>
+  <header>
+    <div>
+      <h1>Informe de contratación por prestación de servicios</h1>
+      <p class="sub">Fondo de Desarrollo Local de Usme · Profesionales y apoyo a la gestión, a partir del Reporte CRP de BogData</p>
+    </div>
+    <div class="status"><a href="../../index.html" style="color:var(--accent)">← Módulos</a><span id="status"></span></div>
+  </header>
+
+  <section class="card load" aria-label="Cargar reporte">
+    <div class="drop" id="drop" tabindex="0" role="button" aria-describedby="dropHelp">
+      <div class="ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"/></svg></div>
+      <div><strong>Cargar Reporte CRP (.xlsx)</strong><small id="dropHelp">Arrastre aquí el reporte histórico exportado de BogData o haga clic para buscarlo. El archivo se procesa en este navegador y no se envía a ningún servidor.</small></div>
+      <input type="file" id="file" accept=".xlsx,.xls,.xlsm" hidden>
+    </div>
+    <div class="opts">
+      <label class="f" for="desde">Desde<select id="desde"></select></label>
+      <label class="f" for="hasta">Hasta<select id="hasta"></select></label>
+      <label class="chk" for="oxp"><input type="checkbox" id="oxp"> Incluir obligaciones por pagar (RB-)</label>
+    </div>
+    <div class="msg full" id="msg" role="status"></div>
+  </section>
+
+  <section class="kpis" id="kpis" aria-label="Resumen"></section>
+
+  <section class="card">
+    <div class="tabs" role="tablist" id="tabs">
+      <button class="tab" role="tab" id="t-r4" aria-selected="true" data-v="r4">Respuesta 4 · Valor comprometido</button>
+      <button class="tab" role="tab" id="t-r5" aria-selected="false" data-v="r5">Respuesta 5 · Comprometido vs girado</button>
+      <button class="tab" role="tab" id="t-r7" aria-selected="false" data-v="r7">Respuesta 7 · N° de contratos</button>
+      <button class="tab" role="tab" id="t-ct" aria-selected="false" data-v="ct">Buscar contrato</button>
+      <button class="tab" role="tab" id="t-ca" aria-selected="false" data-v="ca">Calidad y metodología</button>
+    </div>
+    <div id="view" style="padding-top:16px"></div>
+  </section>
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="motor.js"></script>
+<script src="ejemplo.js"></script>
+<script>
+const SAMPLE = window.EJEMPLO_CPS;
+const $ = s => document.querySelector(s);
+const fmt = n => Math.round(n).toLocaleString('es-CO');
+const mill = n => '$' + (n/1e6).toLocaleString('es-CO',{maximumFractionDigits:0}) + ' M';
+const TIPOS = ['Profesionales','Apoyo a la gestión','Sin clasificar'];
+const COLOR = {'Profesionales':'var(--prof)','Apoyo a la gestión':'var(--apoyo)','Sin clasificar':'var(--warn)'};
+let state = {res:null, rows:null, archivo:null, vista:'r4', q:''};
+let downloads = null;
+try { if (window.claude && window.claude.use) window.claude.use('downloads').then(d => { downloads = d; }).catch(()=>{}); } catch(e) {}
+
+function cuadroDe(){ return state.res ? state.res.cuadro : SAMPLE.cuadro; }
+function meta(){
+  if (state.res) return {archivo:state.archivo, desde:state.res.desde, hasta:state.res.hasta, ejemplo:false, oxp:state.res.oxp, metodos:state.res.metodos, nFilas:state.res.detalle.length, incluirOxP:state.res.incluirOxP};
+  return {archivo:SAMPLE.archivo, desde:SAMPLE.desde, hasta:SAMPLE.hasta, ejemplo:true, oxp:SAMPLE.oxp, metodos:SAMPLE.metodos, nFilas:SAMPLE.nFilas, incluirOxP:false};
+}
+function tiposVisibles(c){ return TIPOS.filter(t => t !== 'Sin clasificar' || c.some(x => x.tipo === t && (x.neto || x.n))); }
+function porAnio(c){
+  const m = {};
+  for (const x of c){ const a = m[x.vig] = m[x.vig] || {vig:x.vig, n:0, vcrp:0, anul:0, neto:0, giro:0, filas:[]}; a.filas.push(x); for (const k of ['n','vcrp','anul','neto','giro']) a[k] += x[k]; }
+  return Object.values(m).sort((a,b)=>a.vig-b.vig);
+}
+
+function renderStatus(){
+  const m = meta();
+  $('#status').innerHTML = m.ejemplo
+    ? `<span class="pill ej">Vista de ejemplo</span> Último informe: ${m.archivo}. Cargue un reporte para recalcular.`
+    : `<span class="pill ok">Calculado</span> ${m.archivo} · ${fmt(state.res.totalFilas)} registros leídos`;
+}
+function renderKPIs(){
+  const c = cuadroDe(), t = c.reduce((s,x)=>({n:s.n+x.n, neto:s.neto+x.neto, giro:s.giro+x.giro}),{n:0,neto:0,giro:0});
+  const m = meta(), ult = porAnio(c).slice(-1)[0];
+  $('#kpis').innerHTML = `
+    <div class="kpi"><span>Valor neto comprometido ${m.desde}–${m.hasta}</span><b>$${fmt(t.neto)}</b><em>${mill(t.neto)}</em></div>
+    <div class="kpi"><span>Giros autorizados</span><b>$${fmt(t.giro)}</b><em>${(t.giro/t.neto*100||0).toFixed(1).replace('.',',')} % de lo comprometido</em></div>
+    <div class="kpi"><span>Contratos</span><b>${fmt(t.n)}</b><em>contados una vez por número y año</em></div>
+    <div class="kpi"><span>Vigencia ${ult ? ult.vig : ''}</span><b>$${fmt(ult ? ult.neto : 0)}</b><em>${ult ? fmt(ult.n) : 0} contratos</em></div>`;
+}
+
+const VISTAS = {
+  r4:{q:'¿Cuánto ha comprometido la Alcaldía Local en contratos de prestación de servicios profesionales y de apoyo a la gestión en cada vigencia?',
+      cols:[['vcrp','Valor CRP'],['anul','Anulaciones'],['neto','Valor neto comprometido']], chart:'neto'},
+  r5:{q:'Valor neto comprometido frente a giros autorizados, por vigencia y tipo de contrato.',
+      cols:[['neto','Valor neto comprometido'],['giro','Giros autorizados'],['pct','% girado']], chart:'giro'},
+  r7:{q:'Número de contratos suscritos y giros autorizados, por vigencia y tipo de contrato.',
+      cols:[['n','N° contratos'],['giro','Giros autorizados']], chart:'n'}
+};
+function filasTabla(v){
+  const c = cuadroDe(), tipos = tiposVisibles(c), out = [];
+  const cell = (x,k) => k==='pct' ? (x.neto ? (x.giro/x.neto*100).toFixed(1).replace('.',',')+' %' : '–') : (k==='n' ? fmt(x[k]) : '$ '+fmt(x[k]));
+  let tot = {n:0,vcrp:0,anul:0,neto:0,giro:0};
+  for (const a of porAnio(c)){
+    for (const t of tipos){ const x = a.filas.find(f=>f.tipo===t); out.push({cls:'', vig:a.vig, tipo:t, vals:v.cols.map(([k])=>cell(x,k)), raw:x}); }
+    out.push({cls:'sub', vig:a.vig, tipo:'Total '+a.vig, vals:v.cols.map(([k])=>cell(a,k)), raw:a});
+    for (const k in tot) tot[k] += a[k];
+  }
+  out.push({cls:'tot', vig:'TOTAL '+meta().desde+'–'+meta().hasta, tipo:'', vals:v.cols.map(([k])=>cell(tot,k)), raw:tot});
+  return out;
+}
+function renderCuadro(key){
+  const v = VISTAS[key], filas = filasTabla(v);
+  const head = `<tr><th>Vigencia</th><th>Tipo de contrato</th>${v.cols.map(([,h])=>`<th class="n">${h}</th>`).join('')}</tr>`;
+  const body = filas.map(f=>`<tr class="${f.cls}"><td>${f.vig}</td><td>${f.cls?'' : `<span class="dot" style="background:${COLOR[f.tipo]}"></span>`}${f.tipo}</td>${f.vals.map(x=>`<td class="n">${x}</td>`).join('')}</tr>`).join('');
+  $('#view').innerHTML = `<div class="panel">
+    <div><p class="q">${v.q}</p><div class="tbl"><table id="tabla">${head}${body}</table></div>
+      <div class="actions">
+        <button class="b" id="bx">Descargar informe en Excel</button>
+        <button class="b sec" id="bc">Copiar tabla</button>
+      </div><div class="msg" id="amsg" role="status"></div></div>
+    <div class="chart"><p class="q" style="margin-bottom:6px">${v.chart==='n'?'Contratos por vigencia':v.chart==='giro'?'Comprometido (barra clara) y girado (barra sólida)':'Valor neto comprometido por vigencia, millones de pesos'}</p>${grafico(v.chart)}
+      <div class="legend">${tiposVisibles(cuadroDe()).map(t=>`<span><span class="dot" style="background:${COLOR[t]}"></span>${t}</span>`).join('')}</div></div>
+  </div>`;
+  $('#bx').onclick = exportar;
+  $('#bc').onclick = () => copiar(filas, v);
+}
+function grafico(k){
+  const anios = porAnio(cuadroDe()), tipos = tiposVisibles(cuadroDe());
+  const W=420,H=280,L=46,B=26,T=12,R=8, iw=W-L-R, ih=H-T-B;
+  const val = (x)=> k==='n' ? x.n : x.neto;
+  const max = Math.max(1,...anios.map(val));
+  const step = niceStep(max/4), top = Math.ceil(max/step)*step;
+  const y = v => T + ih - v/top*ih, bw = iw/anios.length*0.6;
+  let g = '';
+  for (let v=0; v<=top+1e-9; v+=step){ g += `<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end">${k==='n'?fmt(v):fmt(v/1e6)}</text>`; }
+  anios.forEach((a,i)=>{
+    const x = L + iw/anios.length*(i+0.5) - bw/2; let base = 0;
+    for (const t of tipos){
+      const f = a.filas.find(z=>z.tipo===t), v = k==='n'?f.n:f.neto; if (!v) continue;
+      g += `<rect x="${x}" y="${y(base+v)}" width="${bw}" height="${y(base)-y(base+v)}" fill="${COLOR[t]}" opacity="${k==='giro'?0.32:0.9}"><title>${a.vig} · ${t}: ${k==='n'?fmt(v)+' contratos':'$ '+fmt(v)}</title></rect>`;
+      if (k==='giro'){ const gv=f.giro; g += `<rect x="${x+bw*0.18}" y="${y(base+gv)}" width="${bw*0.64}" height="${y(base)-y(base+gv)}" fill="${COLOR[t]}"><title>${a.vig} · ${t} girado: $ ${fmt(gv)}</title></rect>`; }
+      base += v;
+    }
+    g += `<text x="${x+bw/2}" y="${H-8}" text-anchor="middle">${a.vig}</text>`;
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Gráfico por vigencia">${g}</svg>`;
+}
+function niceStep(x){ const p = Math.pow(10,Math.floor(Math.log10(x||1))), n = x/p; return (n<=1?1:n<=2?2:n<=5?5:10)*p; }
+
+function renderContratos(){
+  if (!state.res){ $('#view').innerHTML = `<div class="empty">Cargue el Reporte CRP para buscar un contrato y ver todas sus filas (contrato inicial, adiciones, anulaciones y reemplazos).</div>`; return; }
+  $('#view').innerHTML = `<div class="toolbar"><label class="f" for="q">Número de contrato, beneficiario u objeto<input type="search" id="q" placeholder="Ej. 11-2026 o SOLEY" value="${state.q.replace(/"/g,'&quot;')}" style="min-width:280px"></label>
+    <span class="muted" id="qinfo"></span></div><div class="tbl" id="qres"></div>`;
+  const q = $('#q'); q.oninput = () => { state.q = q.value; buscar(); }; buscar(); q.focus();
+}
+function buscar(){
+  const s = state.q.trim().toUpperCase().replace(/^0+/,'');
+  let cs = state.res.contratos;
+  if (s) cs = cs.filter(c => c.clave.includes(s) || c.filas.some(f => f.benef.toUpperCase().includes(s) || f.objeto.toUpperCase().includes(s) || f.nocomp.includes(s)));
+  cs = cs.slice().sort((a,b)=>a.vig-b.vig || parseInt(a.clave)-parseInt(b.clave));
+  $('#qinfo').textContent = `${fmt(cs.length)} contratos${cs.length>60?' · se muestran los primeros 60':''}`;
+  const rows = cs.slice(0,60).map(c => {
+    const cab = `<tr class="sub"><td>${c.clave}</td><td><span class="dot" style="background:${COLOR[c.tipo]}"></span>${c.tipo}</td><td>${esc(c.benef)}</td><td colspan="2">${c.filas.length} CRP${c.tot<=0?' · <span class="pill warn">anulado</span>':''}</td><td class="n">$ ${fmt(c.tot)}</td><td class="n">$ ${fmt(c.filas.reduce((s,f)=>s+f.giro,0))}</td></tr>`;
+    const det = c.filas.map(f=>`<tr><td class="muted">CRP ${esc(f.crp)}</td><td class="muted">${esc(f.metodo)}</td><td class="muted" style="white-space:normal;max-width:380px">${esc(f.objeto.slice(0,140))}${f.objeto.length>140?'…':''}</td><td class="muted">Ej. ${f.ejercicio}</td><td class="muted">${esc(f.nocomp)}</td><td class="n">$ ${fmt(f.neto)}</td><td class="n">$ ${fmt(f.giro)}</td></tr>`).join('');
+    return cab+det;
+  }).join('');
+  $('#qres').innerHTML = cs.length ? `<table><tr><th>Contrato</th><th>Tipo</th><th>Beneficiario / objeto</th><th></th><th>No. Compromiso</th><th class="n">Valor neto</th><th class="n">Giros</th></tr>${rows}</table>` : `<div class="empty">Ningún contrato coincide con la búsqueda.</div>`;
+}
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function renderCalidad(){
+  const m = meta(), tot = Object.values(m.metodos).reduce((s,x)=>s+x.neto,0);
+  const orden = ['Columna H','Código CPS-P en objeto','Código CPS-AG en objeto','Heredado del contrato','Texto del objeto','Objeto igual a contratos de col. H','Sin clasificar'];
+  const filas = orden.filter(k=>m.metodos[k]).map(k=>{ const x=m.metodos[k], p=x.neto/tot*100;
+    return `<tr><td>${k==='Columna H'?'<span class="pill ok">Dato SAP</span>':k==='Sin clasificar'?'<span class="pill warn">Revisar</span>':'<span class="pill ej">Inferido</span>'} ${k}</td><td class="n">${fmt(x.filas)}</td><td class="n">$ ${fmt(x.neto)}</td><td class="n">${p.toFixed(1).replace('.',',')} %</td></tr>`; }).join('');
+  $('#view').innerHTML = `<div class="panel"><div>
+    <p class="q">Cómo se clasificó cada registro. Lo marcado como inferido sale del texto del objeto y conviene validarlo contra la base de contratación.</p>
+    <div class="tbl"><table><tr><th>Método de clasificación</th><th class="n">Filas</th><th class="n">Valor neto</th><th class="n">% del valor</th></tr>${filas}</table></div>
+    <p class="note" style="margin-top:12px">${m.incluirOxP?'<span class="pill warn">Incluye obligaciones por pagar</span> El total cuenta dos veces el saldo de los contratos que pasaron de año.':`Excluidas ${fmt(m.oxp.filas)} filas de obligaciones por pagar (fondo RB-) por $ ${fmt(m.oxp.neto)}: son el saldo del mismo contrato re-registrado en el año siguiente.`}</p>
+    </div><div><ol class="note">
+      <li><b>Valor comprometido:</b> columna Valor Neto (Valor CRP menos anulaciones).</li>
+      <li><b>Vigencia:</b> año del No. Compromiso (159-2021 o 159-20211 → 2021). Si no lo trae, el año del contrato citado en el objeto (adiciones); si no, el ejercicio. Solo se acepta un año entre el ejercicio y dos años antes.</li>
+      <li><b>Tipo:</b> columna H cuando dice PROFESIONALES o APOYO A LA GESTION. Para el tipo genérico «CONTRATO DE PRESTACION DE SERVICIOS» (persona natural, contratación directa): código CPS-P / CPS-AG del objeto, tipo de otras filas del mismo contrato, palabras del objeto, o tipo de contratos con el mismo objeto en la columna H.</li>
+      <li><b>Contratos:</b> cada número + año cuenta una vez, con todas sus adiciones, y toma el tipo de su CRP de mayor valor. No se cuentan los anulados (valor neto total cero).</li>
+      <li><b>No incluye</b> prestación de servicios con personas jurídicas (NIT). El reporte CRP muestra lo comprometido, no lo apropiado.</li>
+    </ol></div></div>`;
+}
+
+function render(){
+  renderStatus(); renderKPIs();
+  document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected', String(t.dataset.v===state.vista)));
+  if (VISTAS[state.vista]) renderCuadro(state.vista); else if (state.vista==='ct') renderContratos(); else renderCalidad();
+}
+
+// ---------- Carga ----------
+function llenarAnios(lista, d, h){
+  for (const [id,val] of [['#desde',d],['#hasta',h]]){ $(id).innerHTML = lista.map(y=>`<option ${y===val?'selected':''}>${y}</option>`).join(''); }
+}
+llenarAnios([2020,2021,2022,2023,2024,2025,2026], SAMPLE.desde, SAMPLE.hasta);
+function recalcular(){
+  if (!state.rows) { render(); return; }
+  let d = +$('#desde').value, h = +$('#hasta').value; if (d>h) [d,h]=[h,d];
+  try { state.res = MotorCPS.procesar(state.rows, {desde:d, hasta:h, incluirOxP:$('#oxp').checked}); setMsg(''); }
+  catch(e){ setMsg(e.message, true); }
+  render();
+}
+function setMsg(t, err){ const m=$('#msg'); m.textContent=t; m.className='msg full'+(err?' err':''); }
+function leer(file){
+  if (typeof XLSX === 'undefined'){ setMsg('No se pudo cargar el lector de Excel. Revise la conexión a internet y recargue la página.', true); return; }
+  setMsg('Leyendo '+file.name+'…');
+  const fr = new FileReader();
+  fr.onload = e => {
+    try {
+      const wb = XLSX.read(new Uint8Array(e.target.result), {type:'array', cellDates:true});
+      let rows = null, err = null;
+      for (const n of wb.SheetNames){ const r = XLSX.utils.sheet_to_json(wb.Sheets[n], {header:1, raw:true, defval:''}); try { MotorCPS.procesar(r,{desde:2021,hasta:2021}); rows = r; break; } catch(x){ err = x; } }
+      if (!rows) throw err || new Error('El archivo no tiene hojas.');
+      state.rows = rows; state.archivo = file.name;
+      const ejs = [...new Set(rows.slice(1).map(r=>parseInt(r[0],10)).filter(Boolean))].sort();
+      const lista = []; for (let y=Math.min(...ejs); y<=Math.max(...ejs); y++) lista.push(y);
+      llenarAnios(lista, Math.max(lista[0], 2021), lista[lista.length-1]);
+      recalcular();
+      setMsg('');
+    } catch(x){ setMsg('No se pudo leer el archivo: '+x.message, true); }
+  };
+  fr.onerror = () => setMsg('No se pudo leer el archivo. Intente de nuevo.', true);
+  fr.readAsArrayBuffer(file);
+}
+const drop = $('#drop'), inp = $('#file');
+drop.onclick = () => inp.click();
+drop.onkeydown = e => { if (e.key==='Enter'||e.key===' '){ e.preventDefault(); inp.click(); } };
+inp.onchange = () => { if (inp.files[0]) leer(inp.files[0]); inp.value=''; };
+['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over');}));
+['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over');}));
+drop.addEventListener('drop', e => { const f = e.dataTransfer.files[0]; if (f) leer(f); });
+['#desde','#hasta','#oxp'].forEach(id => $(id).onchange = recalcular);
+document.querySelectorAll('.tab').forEach(t => t.onclick = () => { state.vista = t.dataset.v; render(); });
+
+// ---------- Exportar ----------
+function hojaCuadro(cols){
+  const c = cuadroDe(), tipos = tiposVisibles(c), aoa = [['Vigencia','Tipo de contrato',...cols.map(x=>x[1])]];
+  const subs = [];
+  for (const a of porAnio(c)){
+    const r0 = aoa.length + 1;
+    for (const t of tipos){ const x = a.filas.find(f=>f.tipo===t); aoa.push([a.vig, t, ...cols.map(([k])=>x[k])]); }
+    const r1 = aoa.length; aoa.push([a.vig, 'Total '+a.vig, ...cols.map(()=>null)]); subs.push({r:aoa.length, r0, r1});
+  }
+  aoa.push(['TOTAL '+meta().desde+'–'+meta().hasta, null, ...cols.map(()=>null)]);
+  const ws = XLSX.utils.aoa_to_sheet(aoa), L = i => XLSX.utils.encode_col(i);
+  cols.forEach((_,j) => {
+    const col = L(j+2);
+    for (const s of subs) ws[col+s.r] = {t:'n', f:`SUM(${col}${s.r0}:${col}${s.r1})`, z:j===0&&cols[0][0]==='n'?'#,##0':'#,##0'};
+    ws[col+aoa.length] = {t:'n', f: subs.map(s=>col+s.r).join('+'), z:'#,##0'};
+    for (let r=2;r<=aoa.length;r++) if (ws[col+r]) ws[col+r].z = '#,##0';
+  });
+  ws['!cols'] = [{wch:18},{wch:22},...cols.map(()=>({wch:24}))];
+  return ws;
+}
+function libro(){
+  const wb = XLSX.utils.book_new(), m = meta();
+  XLSX.utils.book_append_sheet(wb, hojaCuadro([['vcrp','Valor CRP'],['anul','Anulaciones'],['neto','Valor neto comprometido']]), 'Respuesta 4');
+  XLSX.utils.book_append_sheet(wb, hojaCuadro([['neto','Valor neto comprometido'],['giro','Giros autorizados']]), 'Respuesta 5');
+  XLSX.utils.book_append_sheet(wb, hojaCuadro([['n','N° contratos'],['giro','Giros autorizados']]), 'Respuesta 7');
+  const notas = [['Metodología'],['Fuente: '+m.archivo],['Generado: '+new Date().toLocaleString('es-CO')],[''],
+    ['1. Valor comprometido = Valor Neto (Valor CRP menos anulaciones).'],
+    ['2. Vigencia = año del No. Compromiso (159-2021 o 159-20211 = 2021); si no lo trae, año del contrato citado en el objeto (adiciones); si no, el ejercicio presupuestal. Solo se acepta un año entre el ejercicio y dos años antes.'],
+    ['3. Tipo = columna H cuando dice PROFESIONALES o APOYO A LA GESTION. Para el tipo genérico (persona natural, contratación directa): código CPS-P / CPS-AG del objeto, tipo de otras filas del mismo contrato, palabras del objeto, u objeto igual a contratos de la columna H.'],
+    ['4. Cada número de contrato + año cuenta una vez con todas sus adiciones y toma el tipo de su CRP de mayor valor. No se cuentan los anulados (valor neto total cero).'],
+    [m.incluirOxP ? '5. Incluye obligaciones por pagar (fondo RB-).' : '5. Se excluyen obligaciones por pagar (fondo RB-) para no contar dos veces el mismo compromiso.'],
+    ['6. No incluye prestación de servicios con personas jurídicas (NIT). El reporte CRP muestra lo comprometido, no lo apropiado.']];
+  const wn = XLSX.utils.aoa_to_sheet(notas); wn['!cols']=[{wch:120}]; XLSX.utils.book_append_sheet(wb, wn, 'Metodología');
+  if (state.res){
+    const det = [['Vigencia contrato','Clave contrato','Tipo de contrato','Tipo de la fila','Método','Fuente vigencia','Ejercicio','Fecha registro','Compromiso (col. H)','No. Compromiso','N° CDP','N° CRP','Objeto','Rubro','Fondo','Beneficiario','Valor CRP','Anulaciones','Reintegros','Valor neto','Giros autorizados']];
+    for (const f of state.res.detalle.slice().sort((a,b)=>a.vig-b.vig||a.tipo.localeCompare(b.tipo)||parseInt(a.clave)-parseInt(b.clave)))
+      det.push([f.vig,f.clave,f.tipo,f.tipoFila,f.metodo,f.fuente,f.ejercicio,f.fecha.slice(0,10),f.compromiso,f.nocomp,f.cdp,f.crp,f.objeto,f.rubro,f.fondo,f.benef,f.vcrp,f.anul,f.reint,f.neto,f.giro]);
+    const wd = XLSX.utils.aoa_to_sheet(det); wd['!autofilter']={ref:'A1:U'+det.length}; XLSX.utils.book_append_sheet(wb, wd, 'Detalle');
+  }
+  return wb;
+}
+async function exportar(){
+  const am = $('#amsg');
+  if (typeof XLSX === 'undefined'){ am.textContent='No se pudo cargar el generador de Excel. Revise la conexión.'; am.className='msg err'; return; }
+  const m = meta(), nombre = `Informe_CPS_Usme_${m.desde}-${m.hasta}${m.ejemplo?'_ejemplo':''}.xlsx`;
+  const buf = XLSX.write(libro(), {bookType:'xlsx', type:'array'});
+  if (downloads){
+    try { await downloads.save({filename:nombre, data:new Blob([buf])}); am.textContent='Informe descargado.'; am.className='msg'; }
+    catch(e){ am.textContent = e && e.code==='declined' ? 'Descarga cancelada.' : 'No se pudo descargar en esta vista. Use «Copiar tabla».'; am.className='msg'+(e&&e.code==='declined'?'':' err'); }
+    return;
+  }
+  try { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([buf],{type:'application/octet-stream'})); a.download = nombre; document.body.appendChild(a); a.click(); a.remove(); am.textContent='Informe descargado.'; am.className='msg'; }
+  catch(e){ am.textContent='No se pudo descargar en esta vista. Use «Copiar tabla».'; am.className='msg err'; }
+}
+async function copiar(filas, v){
+  const txt = [['Vigencia','Tipo de contrato',...v.cols.map(c=>c[1])].join('\t'), ...filas.map(f=>[f.vig,f.tipo,...f.vals].join('\t'))].join('\n');
+  const am = $('#amsg');
+  try { await navigator.clipboard.writeText(txt); am.textContent='Tabla copiada. Péguela en Word o Excel.'; am.className='msg'; }
+  catch(e){ am.textContent='El navegador no permitió copiar. Seleccione la tabla y use Ctrl+C.'; am.className='msg err'; }
+}
+render();
+</script>
 </body>
 </html>
